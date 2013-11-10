@@ -1,0 +1,9 @@
+[server]
+addr = 0.0.0.0
+port = 8080
+
+[database]
+dsn = sqlite:///:memory:
+
+[extensions]
+list = hello
