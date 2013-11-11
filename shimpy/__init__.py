@@ -6,44 +6,17 @@ from shimpy.core.database import connect, Session
 
 from ConfigParser import SafeConfigParser
 
-import BaseHTTPServer
 import logging
 
 log = logging.getLogger(__name__)
 
 
-class ShimpyHandler(BaseHTTPServer.BaseHTTPRequestHandler):
-    def do_GET(self):
-        ctx = Context(self)
+class Shimpy(object):
 
-        try:
-            try:
-                ctx.database = Session()
-                self.server.send_event(PageRequestEvent(ctx))
-                Session.commit()
-            except:
-                Session.rollback()
-                raise
-            finally:
-                Session.remove()
-        except Exception as e:
-            ctx.page.status = 500
-            ctx.page.headers = []
-            ctx.page.mode = "data"
-            ctx.page.data = str(e)
+    ###################################################################
+    # Initialisation
+    ###################################################################
 
-        if ctx.page.data == "":
-            ctx.page.status = 404
-            ctx.page.data = "not found"
-
-        self.send_response(ctx.page.status)
-        for k, v in ctx.page.http_headers:
-            self.send_header(k, v)
-        self.end_headers()
-        self.wfile.write(ctx.page.data)
-
-
-class Shimpy(BaseHTTPServer.HTTPServer):
     def __init__(self):
         self.hard_config = None
         self.extensions = []
@@ -55,9 +28,6 @@ class Shimpy(BaseHTTPServer.HTTPServer):
         self.connect_db()
         self.load_config()
         self.load_themelets()
-
-        bind = self.hard_config.get("server", "addr"), int(self.hard_config.get("server", "port"))
-        BaseHTTPServer.HTTPServer.__init__(self, bind, ShimpyHandler)
 
     def load_extensions(self):
         for name in self.hard_config.get("extensions", "list").split(","):
@@ -83,6 +53,40 @@ class Shimpy(BaseHTTPServer.HTTPServer):
     def load_themelets(self):
         pass
 
+    ###################################################################
+    # Page Serving
+    ###################################################################
+
+    def application(self, environment, start_response):
+        ctx = Context(self, environment)
+
+        try:
+            try:
+                ctx.database = Session()
+                self.server.send_event(PageRequestEvent(ctx))
+                Session.commit()
+            except:
+                Session.rollback()
+                raise
+            finally:
+                Session.remove()
+        except Exception as e:
+            ctx.page.status = 500
+            ctx.page.headers = []
+            ctx.page.mode = "data"
+            ctx.page.data = str(e)
+
+        if ctx.page.data == "":
+            ctx.page.status = 404
+            ctx.page.data = "not found"
+
+        start_response(str(ctx.page.status) + " OK?", ctx.page.http_headers)
+        return [ctx.page.data]
+
+    ###################################################################
+    # Page Processing
+    ###################################################################
+
     def send_event(self, event):
         print "Sending %s" % event.__class__.__name__
         method_name = "on" + event.__class__.__name__.replace("Event", "")
@@ -102,7 +106,11 @@ def main():
     s = Shimpy()
     try:
         log.info("Waiting for requests")
-        s.serve_forever()
+        from werkzeug.serving import run_simple
+        run_simple(
+            s.hard_config.get("server", "addr"), int(s.hard_config.get("server", "port")),
+            s.application,
+            use_reloader=True, use_debugger=True, extra_files=["config.ini"]
+        )
     except KeyboardInterrupt:
         pass
-    s.server_close()

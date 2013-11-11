@@ -20,6 +20,7 @@ requires = [
     'coverage',
     'unittest2',
     'mock',
+    'werkzeug',
     ]
 
 setup(name='Shimpy',
