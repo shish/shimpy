@@ -1,4 +1,5 @@
 
 class Extension(object):
-    pass
+    def __init__(self):
+        self.theme = None
 

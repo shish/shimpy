@@ -24,6 +24,12 @@ class User(Base):
     def __repr__(self):
        return "<User(username=%r, password=%r)>" % (self.username, self.password)
 
+class Image(Base):
+    __tablename__ = 'images'
+
+    id = Column(Integer, primary_key=True)
+    hash = Column("hash", String)
+
 
 def connect(config):
     log.info("Connecting to database")

@@ -32,7 +32,9 @@ class ShimpyHandler(BaseHTTPServer.BaseHTTPRequestHandler):
             ctx.page.mode = "data"
             ctx.page.data = str(e)
 
-        ctx.page.render(ctx)
+        if ctx.page.data == "":
+            ctx.page.status = 404
+            ctx.page.data = "not found"
 
         self.send_response(ctx.page.status)
         for k, v in ctx.page.http_headers:
@@ -62,7 +64,11 @@ class Shimpy(BaseHTTPServer.HTTPServer):
             print "Loading extension: %s" % name
 
         from shimpy.ext.hello import Hello
-        self.extensions = [Hello(), ]
+        from shimpy.ext.view import ViewImage
+        self.extensions = [
+            #Hello(),
+            ViewImage(),
+        ]
 
     def load_hard_config(self):
         self.hard_config = SafeConfigParser()

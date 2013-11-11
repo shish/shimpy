@@ -58,4 +58,3 @@ class Page(object):
 
     def add_auto_html_headers(self):
         pass
-

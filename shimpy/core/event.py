@@ -4,4 +4,8 @@ class Event(object):
         self.context = context
 
 class PageRequestEvent(Event):
-    pass
+    def page_matches(self, page):
+        pass
+
+    def get_arg(self, idx):
+        pass
