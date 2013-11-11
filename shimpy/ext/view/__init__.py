@@ -1,6 +1,7 @@
 from shimpy.core.event import Event
 from shimpy.core.extension import Extension
 from shimpy.core.database import Image
+from shimpy.core.themelet import Themelet
 
 
 class DisplayingImageEvent(Event):
@@ -41,7 +42,7 @@ class ImageAdminBlockBuildingEvent(Event):
         self.parts[position] = html
 
 
-class ViewImageTheme():
+class ViewImageTheme(Themelet):
     def display_page(self, page, image, parts):
         page.header = "Image Found: %s" % image.hash
         page.add_block(Block(page.header, "image goes here"))
@@ -49,10 +50,6 @@ class ViewImageTheme():
     def display_admin_block(self, page, parts):
         page.add_block(Block("Image Controls", "<br>".join(parts)))
 
-    def display_error(self, page, status, header, body):
-        page.status = status
-        page.header = header
-        page.add_block(Block(header, body))
 
 class ViewImage(Extension):
     def __init__(self):

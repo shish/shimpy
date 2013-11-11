@@ -33,3 +33,6 @@ def connect(config):
     log.info("Checking connection")
     Session().execute("SELECT 1")
     Session.remove()
+
+    log.info("Creating tables")
+    Base.metadata.create_all(engine)

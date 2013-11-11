@@ -29,6 +29,9 @@ class Block(object):
             "body": self.body,
         }
 
+    def __cmp__(self, other):
+        return cmp(self.position, other.position)
+
 
 class NavBlock(Block):
     def __init__(self):

@@ -29,10 +29,13 @@ class ShimpyHandler(BaseHTTPServer.BaseHTTPRequestHandler):
         except Exception as e:
             ctx.page.status = 500
             ctx.page.headers = []
+            ctx.page.mode = "data"
             ctx.page.data = str(e)
 
+        ctx.page.render(ctx)
+
         self.send_response(ctx.page.status)
-        for k, v in ctx.page.headers:
+        for k, v in ctx.page.http_headers:
             self.send_header(k, v)
         self.end_headers()
         self.wfile.write(ctx.page.data)
@@ -40,8 +43,6 @@ class ShimpyHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 
 class Shimpy(BaseHTTPServer.HTTPServer):
     def __init__(self):
-        BaseHTTPServer.HTTPServer.__init__(self, ("0.0.0.0", 8080), ShimpyHandler)
-
         self.hard_config = None
         self.extensions = []
         self.config = {}
@@ -52,6 +53,9 @@ class Shimpy(BaseHTTPServer.HTTPServer):
         self.connect_db()
         self.load_config()
         self.load_themelets()
+
+        bind = self.hard_config.get("server", "addr"), int(self.hard_config.get("server", "port"))
+        BaseHTTPServer.HTTPServer.__init__(self, bind, ShimpyHandler)
 
     def load_extensions(self):
         for name in self.hard_config.get("extensions", "list").split(","):
