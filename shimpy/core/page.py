@@ -6,30 +6,43 @@ from glob import glob
 
 class Page(object):
     def __init__(self):
-        self.status = 200
-        self.http_headers = []
-
         self.mode = "page"
 
-        # mode = page
-        self.html_headers = []
-        self.title = ""
-        self.heading = ""
-        self.blocks = []
+        # global
+        self.status = 200
+        self.http_headers = []
+        self.content_type = "text/html; charset=utf-8"
 
         # mode = data
-        self.content_type = "text/html; charset=utf-8"
-        self.filename = None
         self.data = ""
+        self.filename = None
 
         # mode = redirect
         self.redirect = None
 
-    def add_html_header(self, data):
+        # mode = page
+        self.title = ""
+        self.heading = ""
+        self.subheading = ""
+        self.quicknav = ""
+        self.html_headers = []
+        self.blocks = []
+
+    # global
+    def add_http_header(self, key, value, position=50):
+        # TODO: order
+        self.http_headers.append((key, value))
+
+    # mode = page
+    def add_html_header(self, data, position=50):
+        # TODO: order
         self.html_headers.append(data)
 
-    def add_http_header(self, key, value):
-        self.http_headers.append((key, value))
+    def get_all_html_headers(self):
+        return literal("\n").join(self.html_headers)
+
+    def delete_all_html_headers(self):
+        self.html_headers = []
 
     def add_block(self, block):
         self.blocks.append(block)
@@ -39,7 +52,15 @@ class Page(object):
         self.add_http_header("X-Powered-By", "Shimpy Alpha")
 
         if self.mode == "page":
-            # TODO: caching headers
+            if context.hard_config.get("cache", "http") == "on":
+                self.add_http_header("Vary", "Cookie, Accept-Encoding")
+                if context.user.is_anonymous() and context.request.method == "GET":
+                    self.add_http_header("Cache-control", "public, max-age=600")
+                    # TODO: self.add_http_header("Expires", time+600)
+                else:
+                    self.add_http_header("Cache-control", "no-cache")
+                    # TODO: self.add_http_header("Expires", time-600)
+
             self.blocks = sorted(self.blocks)
             self.add_auto_html_headers()
             self.data = Layout().display_page(self, context)
@@ -66,6 +87,7 @@ class Page(object):
         self.add_html_header(literal("<link rel='icon' type='image/x-icon' href='/favicon.ico'>"))
         self.add_html_header(literal("<link rel='apple-touch-icon' href='/apple-touch-icon.png'>"))
 
+        # TODO: concatenate files
         for css in glob("shimpy/static/*.css") + glob("shimpy/ext/*/style.css") + glob("shimpy/theme/style.css"):
             self.add_html_header(literal("<link rel='stylesheet' href='%s' type='text/css'>") % css.replace("shimpy/static", ""))
 

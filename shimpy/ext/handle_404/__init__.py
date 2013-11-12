@@ -15,11 +15,16 @@ class Handle404(Extension):
 
         # TODO: handle /foo.bar if /static/foo.bar exists (or theme'd override)
         if re.match("^/[a-zA-Z0-9\.]+$", ctx.request.path):
-            disk_path = os.path.join("shimpy", "static", "./" + ctx.request.path)
-            if os.path.isfile(disk_path):
+            options = [
+                os.path.join("shimpy", "theme", "./" + ctx.request.path),
+                os.path.join("shimpy", "static", "./" + ctx.request.path),
+            ]
+            existing = [path for path in options if os.path.isfile(path)]
+            if existing:
+                disk_path = existing[0]
                 log.info("Serving static file: %s" % disk_path)
                 ctx.page.add_http_header("Cache-control", "public, max-age=600")
-                #ctx.page.add_http_header("Expires", 'D, d M Y H:i:s' + "GMT")
+                # TODO: ctx.page.add_http_header("Expires", 'D, d M Y H:i:s' + "GMT")
                 ctx.page.mode = "data"
                 ctx.page.data = file(disk_path).read()
 
@@ -27,7 +32,8 @@ class Handle404(Extension):
                     "txt": "text/plain",
                     "ico": "image/x-icon",
                     "png": "image/png",
-                    # TODO: css / js?
+                    "css": "text/css",
+                    "js": "application/javascript",
                 }.get(disk_path.partition(".")[-1], "text/plain")
 
         if ctx.page.mode == "page" and self.count_main(ctx) == 0:

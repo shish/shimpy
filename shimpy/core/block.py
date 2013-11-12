@@ -14,10 +14,17 @@ class Block(object):
             self._id = hashlib.md5(body).hexdigest()
 
     def __html__(self, hidable=False):
+        if hidable:
+            toggler = "shm-toggler"
+        else:
+            toggler = ""
+
         if self.header:
-            header = literal("""<h3 data-toggle-sel="%s">%s</h3>""") % (self._id, self.header)
+            header = literal("""<h3 data-toggle-sel="%s" class="%s">%s</h3>""") % (self._id, toggler, self.header)
         else:
             header = ""
+
+        # TODO don't include block body if empty
         return literal("""
             <section id="%(id)s">
                 %(header)s

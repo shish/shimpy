@@ -58,6 +58,10 @@ class ViewImage(Extension):
         database = event.context.database
         send_event = event.context.server.send_event
 
+        if event.page_matches("post/prev") or event.page_matches("post/next"):
+            # TODO
+            pass
+
         if event.page_matches("post/view"):
             image_id = int(event.get_arg(0))
 
@@ -66,6 +70,14 @@ class ViewImage(Extension):
                 send_event(DisplayingImageEvent(event.context, image))
             else:
                 self.theme.display_error(page, 404, "Image not found", "No image in the database has the ID #%d" % image_id)
+
+        if event.page_matches("post/set"):
+            image_id = int(event.context.request.POST["image_id"])
+
+            send_event(ImageInfoSetEvent(event.context, image))
+
+            page.mode = "redirect"
+            page.redirect = make_link("post/view/%d" % image_id, event.context.request.POST["query"])
 
     def onDisplayingImage(self, event):
         user = event.context.user

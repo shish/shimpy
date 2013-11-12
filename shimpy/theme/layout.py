@@ -7,19 +7,20 @@ def get_debug_info():
 
 class Layout(object):
     def display_page(self, page, context):
+        header_html = page.get_html_headers()
         left_block_html = ""
         main_block_html = ""
         sub_block_html = ""
 
-        header_html = literal("\n").join(page.html_headers)
-
         for block in page.blocks:
             if block.section == "left":
                 left_block_html += block.__html__(True)
-            if block.section == "main":
+            elif block.section == "main":
                 main_block_html += block.__html__(False)
-            if block.section == "sub":
+            elif block.section == "sub":
                 sub_block_html += block.__html__(False)
+            else:
+                raise ThemeException("Block %r using an unknown section (%r)" % (block.header, block.section))
 
         debug = get_debug_info()
 
@@ -29,11 +30,16 @@ class Layout(object):
         else:
             contact = ""
 
-        flash_html = ""
-
         wrapper = ""
         if len(page.heading) > 100:
             wrapper = ' style="height: 3em; overflow: auto;"'
+
+        flash = context.request.cookies.get("shm_flash_message")
+        flash_html = ""
+        if flash:
+            # TODO:
+            #flash_html = "<b id='flash'>".nl2br(html_escape($flash))." <a href='#' onclick=\"\$('#flash').hide(); return false;\">[X]</a></b>";
+            #set_prefixed_cookie("flash_message", "", -1, "/");
 
         return literal("""
 <!doctype html>
