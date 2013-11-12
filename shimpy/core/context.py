@@ -1,5 +1,6 @@
 from shimpy.core.page import Page
 
+from werkzeug.wrappers import Request
 
 class Context(object):
     """
@@ -8,9 +9,8 @@ class Context(object):
     """
     def __init__(self, server, environment):
         self.environment = environment
-        #'REQUEST_METHOD': 'GET', 'PATH_INFO': '/post/view/2'
-        #self.server = request.server
-        #self.request = request
+        self.server = server
+        self.request = Request(environment)
         self.page = Page()
         self.user = None
         self.database = server.database

@@ -1,7 +1,4 @@
-from shimpy.core.event import Event
-from shimpy.core.extension import Extension
-from shimpy.core.database import Image
-from shimpy.core.themelet import Themelet
+from shimpy.core import Block, Event, Extension, Image, Themelet
 
 
 class DisplayingImageEvent(Event):
@@ -11,7 +8,7 @@ class DisplayingImageEvent(Event):
 
 
 class ImageInfoBoxBuildingEvent(Event):
-    def __init__(self, context, image, user):
+    def __init__(self, context, image):
         Event.__init__(self, context)
         self.image = image
         self.user = context.user
@@ -30,7 +27,7 @@ class ImageInfoSetEvent(Event):
 
 
 class ImageAdminBlockBuildingEvent(Event):
-    def __init__(self, context, image, user):
+    def __init__(self, context, image):
         Event.__init__(self, context)
         self.image = image
         self.user = context.user
@@ -73,6 +70,7 @@ class ViewImage(Extension):
     def onDisplayingImage(self, event):
         user = event.context.user
         image = event.image
+        send_event = event.context.server.send_event
 
         iibbe = ImageInfoBoxBuildingEvent(event.context, image)
         send_event(iibbe)

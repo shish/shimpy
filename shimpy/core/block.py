@@ -13,7 +13,7 @@ class Block(object):
         else:
             self._id = hashlib.md5(body).hexdigest()
 
-    def __html__(self):
+    def __html__(self, hidable=False):
         if self.header:
             header = literal("""<h3 data-toggle-sel="%s">%s</h3>""") % (self._id, self.header)
         else:

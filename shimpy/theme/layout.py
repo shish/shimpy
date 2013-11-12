@@ -11,16 +11,16 @@ class Layout(object):
         main_block_html = ""
         sub_block_html = ""
 
-        header_html = "\n".join(page.html_headers)
+        header_html = literal("\n").join(page.html_headers)
 
         for block in page.blocks:
             if block.section == "left":
-                left_block_html += block.get_html(True)
+                left_block_html += block.__html__(True)
             if block.section == "main":
-                main_block_html += block.get_html(False)
+                main_block_html += block.__html__(False)
             if block.section == "sub":
-                sub_block_html += block.get_html(False)
-        
+                sub_block_html += block.__html__(False)
+
         debug = get_debug_info()
 
         contact_link = context.config.get("contact_link")

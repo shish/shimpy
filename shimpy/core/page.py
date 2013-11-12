@@ -1,5 +1,7 @@
 from shimpy.theme.layout import Layout
+
 from webhelpers.html import literal
+from glob import glob
 
 
 class Page(object):
@@ -35,7 +37,7 @@ class Page(object):
     def render(self, context):
         self.add_http_header("Content-type", self.content_type)
         self.add_http_header("X-Powered-By", "Shimpy Alpha")
-        
+
         if self.mode == "page":
             # TODO: caching headers
             self.blocks = sorted(self.blocks)
@@ -56,5 +58,16 @@ class Page(object):
         else:
             self.data = "Invalid page mode: %r" % self.mode
 
+        if type(self.data) != bytes:
+            self.data = bytes(self.data)
+
     def add_auto_html_headers(self):
-        pass
+        # 404/static handler will map these to themes/foo/bar.ico or lib/static/bar.ico
+        self.add_html_header(literal("<link rel='icon' type='image/x-icon' href='/favicon.ico'>"))
+        self.add_html_header(literal("<link rel='apple-touch-icon' href='/apple-touch-icon.png'>"))
+
+        for css in glob("shimpy/static/*.css") + glob("shimpy/ext/*/style.css") + glob("shimpy/theme/style.css"):
+            self.add_html_header(literal("<link rel='stylesheet' href='%s' type='text/css'>") % css.replace("shimpy/static", ""))
+
+        for js in glob("shimpy/static/*.js") + glob("shimpy/ext/*/script.css") + glob("shimpy/theme/script.js"):
+            self.add_html_header(literal("<script src='%s'></script>") % js.replace("shimpy/static", ""))

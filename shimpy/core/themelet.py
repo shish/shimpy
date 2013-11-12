@@ -1,3 +1,5 @@
+from shimpy.core.block import Block
+
 
 class Themelet(object):
     def display_error(self, page, status, header, body):

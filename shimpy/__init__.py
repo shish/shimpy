@@ -31,14 +31,17 @@ class Shimpy(object):
 
     def load_extensions(self):
         for name in self.hard_config.get("extensions", "list").split(","):
-            print "Loading extension: %s" % name
+            log.info("Loading extension: %(extension)s", {"extension": name})
 
         from shimpy.ext.hello import Hello
         from shimpy.ext.view import ViewImage
+        from shimpy.ext.handle_404 import Handle404
         self.extensions = [
             #Hello(),
             ViewImage(),
+            Handle404(),
         ]
+        self.extensions = sorted(self.extensions)
 
     def load_hard_config(self):
         self.hard_config = SafeConfigParser()
@@ -61,24 +64,16 @@ class Shimpy(object):
         ctx = Context(self, environment)
 
         try:
-            try:
-                ctx.database = Session()
-                self.server.send_event(PageRequestEvent(ctx))
-                Session.commit()
-            except:
-                Session.rollback()
-                raise
-            finally:
-                Session.remove()
-        except Exception as e:
-            ctx.page.status = 500
-            ctx.page.headers = []
-            ctx.page.mode = "data"
-            ctx.page.data = str(e)
+            ctx.database = Session()
+            self.send_event(PageRequestEvent(ctx))
+            Session.commit()
+        except:
+            Session.rollback()
+            raise
+        finally:
+            Session.remove()
 
-        if ctx.page.data == "":
-            ctx.page.status = 404
-            ctx.page.data = "not found"
+        ctx.page.render(ctx)
 
         start_response(str(ctx.page.status) + " OK?", ctx.page.http_headers)
         return [ctx.page.data]
@@ -88,7 +83,7 @@ class Shimpy(object):
     ###################################################################
 
     def send_event(self, event):
-        print "Sending %s" % event.__class__.__name__
+        log.info("Sending %(event)s", {"event": event.__class__.__name__})
         method_name = "on" + event.__class__.__name__.replace("Event", "")
         for ext in self.extensions:
             if hasattr(ext, method_name):
@@ -101,7 +96,7 @@ def main():
     logging.basicConfig(
         level=logging.INFO,
         #format="%(asctime)s %4.4(levelname)s %(name)s %(message)s"
-        format="%(asctime)s %(name)s %(message)s"
+        format="%(asctime)s %(levelname)4.4s %(name)s %(message)s"
     )
     s = Shimpy()
     try:
