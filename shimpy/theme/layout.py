@@ -40,6 +40,7 @@ class Layout(object):
             # TODO:
             #flash_html = "<b id='flash'>".nl2br(html_escape($flash))." <a href='#' onclick=\"\$('#flash').hide(); return false;\">[X]</a></b>";
             #set_prefixed_cookie("flash_message", "", -1, "/");
+            pass
 
         return literal("""
 <!doctype html>

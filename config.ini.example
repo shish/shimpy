@@ -7,3 +7,6 @@ dsn = sqlite:///:memory:
 
 [extensions]
 list = hello
+
+[cache]
+http = on
