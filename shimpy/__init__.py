@@ -61,19 +61,18 @@ class Shimpy(object):
     ###################################################################
 
     def application(self, environment, start_response):
-        ctx = Context(self, environment)
+        sess = Session()
+        ctx = Context(self, sess, environment)
 
         try:
-            ctx.database = Session()
             self.send_event(PageRequestEvent(ctx))
+            ctx.page.render(ctx)
             Session.commit()
         except:
             Session.rollback()
             raise
         finally:
             Session.remove()
-
-        ctx.page.render(ctx)
 
         start_response(str(ctx.page.status) + " OK?", ctx.page.http_headers)
         return [ctx.page.data]

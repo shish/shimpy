@@ -7,7 +7,7 @@ def get_debug_info():
 
 class Layout(object):
     def display_page(self, page, context):
-        header_html = page.get_html_headers()
+        header_html = page.get_all_html_headers()
         left_block_html = ""
         main_block_html = ""
         sub_block_html = ""

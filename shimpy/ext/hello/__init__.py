@@ -1,5 +1,6 @@
 from shimpy.core.extension import Extension
-from shimpy.core.database import User
+from shimpy.core.models import User
+
 
 class Hello(Extension):
     def onPageRequest(self, event):

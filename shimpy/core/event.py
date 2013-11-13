@@ -44,7 +44,7 @@ class PageRequestEvent(Event):
         self.args = []
 
         if not self.path:
-            self.path = context.config.get("front_page")
+            self.path = context.config.get("front_page", "post/list")
 
     def page_matches(self, page):
         """
