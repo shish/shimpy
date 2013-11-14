@@ -1,5 +1,6 @@
 from shimpy.core import Block, Event, Extension, Themelet
 from shimpy.core.models import Image
+from webhelpers.html import literal
 
 
 class DisplayingImageEvent(Event):
@@ -42,8 +43,16 @@ class ImageAdminBlockBuildingEvent(Event):
 
 class ViewImageTheme(Themelet):
     def display_page(self, page, image, parts):
-        page.header = "Image Found: %s" % image.fingerprint
-        page.add_block(Block(page.header, "image goes here"))
+        page.heading = " ".join([t.name for t in image.tags])
+        page.title = "Image %d: %s" % (image.id, page.heading)
+        page.add_html_header(literal("<meta name=\"keywords\" content=\"%s\">") % page.heading.replace(" ", ", "))
+        page.add_html_header(literal("<meta property=\"og:title\" content=\"%s\">") % page.heading.replace(" ", ", "))
+        page.add_html_header(literal("<meta property=\"og:type\" content=\"article\">"))
+        page.add_html_header(literal("<meta property=\"og:image\" content=\"%s\">") % image.get_thumb_link())
+        page.add_html_header(literal("<meta property=\"og:url\" content=\"%s\">") % image.get_page_link())
+        # TODO: navigation
+        # TODO: image info
+        page.add_block(Block("Image Found: %s" % image.fingerprint, "image goes here"))
 
     def display_admin_block(self, page, parts):
         page.add_block(Block("Image Controls", "<br>".join(parts)))

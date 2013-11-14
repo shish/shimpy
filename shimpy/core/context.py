@@ -2,6 +2,7 @@ from shimpy.core.page import Page
 from shimpy.core.models import User
 
 from werkzeug.wrappers import Request
+from webhelpers.html import literal
 
 
 def _get_user(database, request):
@@ -24,3 +25,6 @@ class Context(object):
         self.hard_config = server.hard_config
 
         self._event_count = 0
+
+    def get_debug_info(self):
+        return literal("<br>Events sent: %d") % self._event_count

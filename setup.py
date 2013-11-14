@@ -9,6 +9,7 @@ CHANGES = ""  # open(os.path.join(here, 'CHANGES.txt')).read()
 requires = [
     'SQLAlchemy',
     'webhelpers',
+    'mako',
 
     #'psycopg2',
     'bbcode',

@@ -41,6 +41,13 @@ class Post(Base):
             global_registries.last.settings.get("votabo.image_link", "/images/$(hash)s/$(id)s$$20-$$20$(tags)s.$(ext)s").replace("$", "%")
         )
 
+    def get_thumb_link(self):
+        return ""
+    def get_image_link(self):
+        return ""
+    def get_page_link(self):
+        return ""
+
     def parse_link_template(self, tmpl):
         tmpl = tmpl % {
             "id": self.id,

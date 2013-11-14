@@ -1,5 +1,4 @@
-from shimpy.theme.layout import Layout
-
+from mako.template import Template
 from webhelpers.html import literal
 from glob import glob
 
@@ -38,9 +37,6 @@ class Page(object):
         # TODO: order
         self.html_headers.append(data)
 
-    def get_all_html_headers(self):
-        return literal("\n").join(self.html_headers)
-
     def delete_all_html_headers(self):
         self.html_headers = []
 
@@ -63,7 +59,9 @@ class Page(object):
 
             self.blocks = sorted(self.blocks)
             self.add_auto_html_headers()
-            self.data = Layout().display_page(self, context)
+
+            template = Template(filename='shimpy/theme/layout.mako')
+            self.data = template.render(ctx=context, page=self)
             self.mode = "data"
             self.filename = None
 
