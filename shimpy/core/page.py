@@ -2,6 +2,8 @@ from mako.template import Template
 from webhelpers.html import literal
 from glob import glob
 
+from datetime import datetime, timedelta
+
 
 class Page(object):
     def __init__(self):
@@ -31,6 +33,10 @@ class Page(object):
     def add_http_header(self, key, value, position=50):
         # TODO: order
         self.http_headers.append((key, value))
+
+    def set_expiration(self, seconds):
+        self.add_http_header("Cache-control", "public, max-age=%d" % seconds)
+        self.add_http_header("Expires", (datetime.now() + timedelta(seconds=seconds)).strftime("%a, %d %b %Y %H:%M:%S %Z"))
 
     # mode = page
     def add_html_header(self, data, position=50):
@@ -87,7 +93,9 @@ class Page(object):
 
         # TODO: concatenate files
         for css in glob("shimpy/static/*.css") + glob("shimpy/ext/*/style.css") + glob("shimpy/theme/style.css"):
-            self.add_html_header(literal("<link rel='stylesheet' href='%s' type='text/css'>") % css.replace("shimpy/static", ""))
+            css = css.replace("shimpy/static/", "")
+            css = css.replace("shimpy/theme/", "")
+            self.add_html_header(literal("<link rel='stylesheet' href='/%s' type='text/css'>") % css)
 
         for js in glob("shimpy/static/*.js") + glob("shimpy/ext/*/script.css") + glob("shimpy/theme/script.js"):
             self.add_html_header(literal("<script src='%s'></script>") % js.replace("shimpy/static", ""))

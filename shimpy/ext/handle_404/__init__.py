@@ -14,7 +14,7 @@ class Handle404(Extension):
         ctx = event.context
 
         # TODO: handle /foo.bar if /static/foo.bar exists (or theme'd override)
-        if re.match("^/[a-zA-Z0-9\.]+$", ctx.request.path):
+        if re.match("^/[a-zA-Z0-9\.\-]+$", ctx.request.path):
             options = [
                 os.path.join("shimpy", "theme", "./" + ctx.request.path),
                 os.path.join("shimpy", "static", "./" + ctx.request.path),
@@ -23,8 +23,7 @@ class Handle404(Extension):
             if existing:
                 disk_path = existing[0]
                 log.info("Serving static file: %s" % disk_path)
-                ctx.page.add_http_header("Cache-control", "public, max-age=600")
-                # TODO: ctx.page.add_http_header("Expires", 'D, d M Y H:i:s' + "GMT")
+                ctx.page.set_expiration(600)
                 ctx.page.mode = "data"
                 ctx.page.data = file(disk_path).read()
 
@@ -34,7 +33,7 @@ class Handle404(Extension):
                     "png": "image/png",
                     "css": "text/css",
                     "js": "application/javascript",
-                }.get(disk_path.partition(".")[-1], "text/plain")
+                }.get(disk_path.split(".")[-1], "text/plain")
 
         if ctx.page.mode == "page" and self.count_main(ctx) == 0:
             log.info("404 handler called for %r" % ctx.request.path)

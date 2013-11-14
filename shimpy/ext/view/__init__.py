@@ -55,7 +55,7 @@ class ViewImageTheme(Themelet):
         page.add_block(Block("Image Found: %s" % image.fingerprint, "image goes here"))
 
     def display_admin_block(self, page, parts):
-        page.add_block(Block("Image Controls", "<br>".join(parts)))
+        page.add_block(Block("Image Controls", "<br>".join(parts), "left", 50))
 
 
 class ViewImage(Extension):

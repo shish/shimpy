@@ -30,9 +30,9 @@ if flash:
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en"> <!--<![endif]-->
     <head>
         <title>${page.title}</title>
-		% for header in page.html_headers:
-		${header}
-		% endfor
+        % for header in page.html_headers:
+        ${header}
+        % endfor
     </head>
 
     <body>
