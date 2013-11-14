@@ -92,7 +92,7 @@ class Page(object):
         self.add_html_header(literal("<link rel='apple-touch-icon' href='/apple-touch-icon.png'>"))
 
         # TODO: concatenate files
-        for css in glob("shimpy/static/*.css") + glob("shimpy/ext/*/style.css") + glob("shimpy/theme/style.css"):
+        for css in glob("shimpy/static/*.css") + glob("shimpy/ext/*/style.css") + glob("shimpy/theme/*.css"):
             css = css.replace("shimpy/static/", "")
             css = css.replace("shimpy/theme/", "")
             self.add_html_header(literal("<link rel='stylesheet' href='/%s' type='text/css'>") % css)

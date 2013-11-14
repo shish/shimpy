@@ -1,0 +1,225 @@
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+*                  things common to all pages                    *
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+BODY {
+	background: #EEE;
+	font-family: sans-serif;
+	font-size: 14px;
+	margin: 0px;
+}
+H1 {
+	background: #BBB;
+	text-align: center;
+	border: 1px solid #AAA;
+	line-height: 28px; /* KG customization */
+}
+H1 A {
+	color: black;
+}
+H3 {
+	text-align: center;
+	margin: 0px;
+}
+.hrr {
+	background: #CCC;
+	border: 1px solid #BBB;
+}
+.brr, .thumb {
+	background: #DDD;
+	border: 1px solid #CCC;
+}
+.brr, .hrr, H1, FOOTER, .thumb {
+	margin: 8px;
+	padding: 8px;
+	border-radius: 12px; /* standard, webkit, opera */
+	-moz-border-radius: 12px; /* mozilla haven't committed yet */
+	box-shadow: 2px 2px 6px rgba(0,0,0,0.6); /* standard, opera */
+	-webkit-box-shadow: 2px 2px 6px rgba(0,0,0,0.6); /* webkit haven't committed yet */
+	-moz-box-shadow: 2px 2px 6px rgba(0,0,0,0.6); /* mozilla haven't committed yet */
+}
+THEAD {
+	font-weight: bold;
+}
+TD {
+	vertical-align: top;
+	text-align: center;
+}
+FOOTER {
+	text-align: center;
+	background: #BBB;
+	border: 1px solid #AAA;
+}
+
+
+
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+*             the navigation bar, and all its blocks             *
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+NAV {
+	width: 200px;
+	float: left;
+	text-align: center;
+	margin-left: 16px;
+}
+NAV .blockbody {
+	font-size: 0.85em;
+	text-align: center;
+	overflow: hidden;
+}
+NAV TABLE {
+	width: 150px;
+}
+NAV TD {
+	vertical-align: middle;
+}
+NAV INPUT {
+	width: 100%;
+	padding: 0px;
+}
+NAV SELECT {
+	width: 100%;
+	padding: 0px;
+}
+
+#comments P {
+	text-align: left;
+	width: 150px;
+	max-width: 150px;
+	overflow: hidden;
+}
+.comment {
+	text-align: left;
+}
+
+.more:after {
+	content: " >>>";
+}
+
+.tag_count:before {
+	content: "(";
+}
+.tag_count:after {
+	content: ")";
+}
+
+.paginator {
+	clear: both;
+	padding: 4px;
+	margin-bottom: 32px;
+}
+
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+*                 the main part of each page                     *
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+#body {
+	margin-left: 226px;
+	margin-right: 16px;
+	text-align: center;
+	height: 1%;
+}
+#body TABLE {
+	width: 90%;
+	margin: auto;
+}
+
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+*                     specific page types                        *
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+#pagelist {
+	margin-top: 32px;
+}
+
+#tagmap A {
+	padding: 8px 4px 8px 4px;
+}
+
+.setupblock {
+	text-align: center;
+	width: 350px;
+}
+.setupblock TEXTAREA {
+	width: 300px;
+	font-size: 0.75em;
+}
+
+.helpable {
+	border-bottom: 1px dashed gray;
+}
+
+.ok {
+	background: #AFA;
+}
+.bad {
+	background: #FAA;
+}
+
+NAV .thumbblock {
+	float: none;
+	height: auto;
+}
+NAV .thumb {
+	margin-bottom: 0px;
+}
+.thumbblock {
+	width: 220px;
+	height: 220px;
+	display: inline-block;
+	text-align: center;
+	float: left;
+}
+.thumb {
+	display: inline-block;
+	margin-bottom: 32px;
+}
+
+#downtime #message, #downtime #login {
+	text-align: center;
+}
+#downtime H3 {
+	margin-top: 32px;
+}
+.tagcategoryblock {
+margin:0.6rem 1rem 0.6rem 0;
+padding:0.5rem 0.6rem 0.7rem;
+width:18rem;
+border:1px solid #AAAAAA;
+border-radius:0.25rem;
+display:inline-block;
+}
+.tagcategoryblock table {
+width:100%;
+border-spacing:0;
+}
+.tagcategoryblock input, .tagcategoryblock span {
+width:100%;
+height:100%;
+}
+.tagcategoryblock td:first-child {
+padding:0.3rem 0.7rem 0.4rem 0;
+text-align:right;
+width:40%;
+}
+.tagcategoryblock td:last-child {
+width:60%;
+}
+.tagcategoryblock td:last-child span {
+padding:0.24rem 0.7rem 0.5rem 0;
+display:block;
+}
+.tagcategoryblock button {
+width:100%;
+margin-top:0.4rem;
+padding:0.2rem 0.6rem;
+}
+#downtime #login_table {
+	margin: auto;
+}
+
