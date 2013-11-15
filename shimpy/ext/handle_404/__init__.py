@@ -16,8 +16,8 @@ class Handle404(Extension):
         # TODO: handle /foo.bar if /static/foo.bar exists (or theme'd override)
         if re.match("^/[a-zA-Z0-9\.\-]+$", ctx.request.path):
             options = [
-                os.path.join("shimpy", "theme", "./" + ctx.request.path),
-                os.path.join("shimpy", "static", "./" + ctx.request.path),
+                os.path.abspath(os.path.join("shimpy", "theme", "./" + ctx.request.path)),
+                os.path.abspath(os.path.join("shimpy", "static", "./" + ctx.request.path)),
             ]
             existing = [path for path in options if os.path.isfile(path)]
             if existing:

@@ -1,8 +1,8 @@
 from mako.template import Template
 from webhelpers.html import literal
 from glob import glob
-
 from datetime import datetime, timedelta
+from shimpy.core.utils import SparseList
 
 
 class Page(object):
@@ -11,7 +11,7 @@ class Page(object):
 
         # global
         self.status = 200
-        self.http_headers = []
+        self.http_headers = SparseList()
         self.content_type = "text/html; charset=utf-8"
 
         # mode = data
@@ -26,13 +26,12 @@ class Page(object):
         self.heading = ""
         self.subheading = ""
         self.quicknav = ""
-        self.html_headers = []
+        self.html_headers = SparseList()
         self.blocks = []
 
     # global
     def add_http_header(self, key, value, position=50):
-        # TODO: order
-        self.http_headers.append((key, value))
+        self.http_headers.insert(position, (key, value))
 
     def set_expiration(self, seconds):
         self.add_http_header("Cache-control", "public, max-age=%d" % seconds)
@@ -40,8 +39,7 @@ class Page(object):
 
     # mode = page
     def add_html_header(self, data, position=50):
-        # TODO: order
-        self.html_headers.append(data)
+        self.html_headers.insert(position, data)
 
     def delete_all_html_headers(self):
         self.html_headers = []

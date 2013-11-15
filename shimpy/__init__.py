@@ -36,9 +36,11 @@ class Shimpy(object):
         from shimpy.ext.hello import Hello
         from shimpy.ext.view import ViewImage
         from shimpy.ext.handle_404 import Handle404
+        from shimpy.ext.index import Index
         self.extensions = [
             #Hello(),
             ViewImage(),
+            Index(),
             Handle404(),
         ]
         self.extensions = sorted(self.extensions)

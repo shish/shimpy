@@ -29,6 +29,14 @@ class Post(Base):
 
     score = Column("numeric_score", Integer, nullable=False, default=0)
 
+    @staticmethod
+    def count_pages(search_terms):
+        return 1
+
+    @staticmethod
+    def find_images(start, offset, search_terms):
+        return []
+
     @property
     def thumb_url(self):
         return self.parse_link_template(

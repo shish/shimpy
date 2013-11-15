@@ -63,7 +63,7 @@ class PageRequestEvent(Event):
         req_path = self.path
         if req_path.startswith(page):
             arg_str = req_path[len(page):].lstrip("/")
-            self.args = arg_str.split("/")
+            self.args = arg_str.split("/") if arg_str else []
             return True
         return False
 
@@ -112,7 +112,7 @@ class PageRequestEvent(Event):
         return page_number
 
     def get_page_size(self):
-        return self.context.config.get("index_images")
+        return self.context.config.get("index_images", 24)
 
 
 class CommandEvent(Event):
