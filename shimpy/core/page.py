@@ -31,18 +31,21 @@ class Page(object):
 
     # global
     def add_http_header(self, key, value, position=50):
-        self.http_headers.insert(position, (key, value))
+        self.http_headers[position] = (key, value)
 
     def set_expiration(self, seconds):
-        self.add_http_header("Cache-control", "public, max-age=%d" % seconds)
+        if seconds > 0:
+            self.add_http_header("Cache-control", "public, max-age=%d" % seconds)
+        else:
+            self.add_http_header("Cache-control", "no-cache")
         self.add_http_header("Expires", (datetime.now() + timedelta(seconds=seconds)).strftime("%a, %d %b %Y %H:%M:%S %Z"))
 
     # mode = page
     def add_html_header(self, data, position=50):
-        self.html_headers.insert(position, data)
+        self.html_headers[position] = data
 
     def delete_all_html_headers(self):
-        self.html_headers = []
+        self.html_headers = SparseList()
 
     def add_block(self, block):
         self.blocks.append(block)
@@ -55,11 +58,9 @@ class Page(object):
             if context.hard_config.get("cache", "http") == "on":
                 self.add_http_header("Vary", "Cookie, Accept-Encoding")
                 if context.user.is_anonymous() and context.request.method == "GET":
-                    self.add_http_header("Cache-control", "public, max-age=600")
-                    # TODO: self.add_http_header("Expires", time+600)
+                    self.set_expiration(600)
                 else:
-                    self.add_http_header("Cache-control", "no-cache")
-                    # TODO: self.add_http_header("Expires", time-600)
+                    self.set_expiration(-1)
 
             self.blocks = sorted(self.blocks)
             self.add_auto_html_headers()
@@ -75,6 +76,7 @@ class Page(object):
                 self.add_http_header("Content-Disposition", "attachment; filename=" + self.filename)
 
         elif self.mode == "redirect":
+            self.status = 302
             self.add_http_header("Location", self.redirect)
             self.data = literal('You should be redirected to <a href="%s">%s</a>') % (self.redirect, self.redirect)
 

@@ -2,11 +2,12 @@ import hashlib
 from webhelpers.html import literal
 
 class Block(object):
-    def __init__(self, header, body, section="main", position="0"):
+    def __init__(self, header, body, section="main", position="0", class_=None):
         self.header = header
         self.body = body
         self.section = section
         self.position = position
+        self.class_ = class_
 
         if header:
             self._id = header.replace(" ", "_")

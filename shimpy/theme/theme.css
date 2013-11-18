@@ -22,15 +22,15 @@ H3 {
 	text-align: center;
 	margin: 0px;
 }
-.hrr {
+SECTION>H3 {
 	background: #CCC;
 	border: 1px solid #BBB;
 }
-.brr, .thumb {
+SECTION>.blockbody, .thumb {
 	background: #DDD;
 	border: 1px solid #CCC;
 }
-.brr, .hrr, H1, FOOTER, .thumb {
+SECTION>.blockbody, SECTION>H3, H1, FOOTER, .thumb {
 	margin: 8px;
 	padding: 8px;
 	border-radius: 12px; /* standard, webkit, opera */
@@ -106,27 +106,27 @@ NAV SELECT {
 	content: ")";
 }
 
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+*                 the main part of each page                     *
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+ARTICLE {
+	margin-left: 226px;
+	margin-right: 16px;
+	text-align: center;
+	height: 1%;
+}
+ARTICLE TABLE {
+	width: 90%;
+	margin: auto;
+}
+
 .paginator {
 	clear: both;
 	padding: 4px;
 	margin-bottom: 32px;
 }
 
-
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-*                 the main part of each page                     *
-* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-
-#body {
-	margin-left: 226px;
-	margin-right: 16px;
-	text-align: center;
-	height: 1%;
-}
-#body TABLE {
-	width: 90%;
-	margin: auto;
-}
 
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -186,40 +186,3 @@ NAV .thumb {
 #downtime H3 {
 	margin-top: 32px;
 }
-.tagcategoryblock {
-margin:0.6rem 1rem 0.6rem 0;
-padding:0.5rem 0.6rem 0.7rem;
-width:18rem;
-border:1px solid #AAAAAA;
-border-radius:0.25rem;
-display:inline-block;
-}
-.tagcategoryblock table {
-width:100%;
-border-spacing:0;
-}
-.tagcategoryblock input, .tagcategoryblock span {
-width:100%;
-height:100%;
-}
-.tagcategoryblock td:first-child {
-padding:0.3rem 0.7rem 0.4rem 0;
-text-align:right;
-width:40%;
-}
-.tagcategoryblock td:last-child {
-width:60%;
-}
-.tagcategoryblock td:last-child span {
-padding:0.24rem 0.7rem 0.5rem 0;
-display:block;
-}
-.tagcategoryblock button {
-width:100%;
-margin-top:0.4rem;
-padding:0.2rem 0.6rem;
-}
-#downtime #login_table {
-	margin: auto;
-}
-

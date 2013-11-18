@@ -1,4 +1,5 @@
 from .meta import *
+from shimpy.core.utils import make_link
 #from votabo.lib.balance import balance
 
 
@@ -31,30 +32,31 @@ class Post(Base):
 
     @staticmethod
     def count_pages(search_terms):
-        return 1
+        return Post.find_all_images(search_terms).count()
 
     @staticmethod
     def find_images(start, offset, search_terms):
-        return []
+        return Post.find_all_images(search_terms)[start:start + offset]
+
+    @staticmethod
+    def find_all_images(search_terms):
+        return DBSession.query(Post).limit(100)
 
     @property
     def thumb_url(self):
         return self.parse_link_template(
-            global_registries.last.settings.get("votabo.thumb_link", "/thumbs/$(hash)s/thumb.jpg").replace("$", "%")
+            ("/thumbs/$(hash)s/thumb.jpg").replace("$", "%")
         )
 
     @property
     def image_url(self):
         return self.parse_link_template(
-            global_registries.last.settings.get("votabo.image_link", "/images/$(hash)s/$(id)s$$20-$$20$(tags)s.$(ext)s").replace("$", "%")
+            ("/images/$(hash)s/$(id)s$$20-$$20$(tags)s.$(ext)s").replace("$", "%")
         )
 
-    def get_thumb_link(self):
-        return ""
-    def get_image_link(self):
-        return ""
-    def get_page_link(self):
-        return ""
+    @property
+    def page_url(self):
+        return make_link("post/view/"+str(self.id))
 
     def parse_link_template(self, tmpl):
         tmpl = tmpl % {
@@ -64,7 +66,7 @@ class Post(Base):
             #"base": self.,
             "ext": "jpg",  # FIXME
         }
-        tmpl = balance(tmpl)
+        #tmpl = balance(tmpl)
         return tmpl
 
     @property

@@ -1,11 +1,12 @@
-from shimpy.core import Extension, Block, NavBlock, Themelet, Event
+from shimpy.core import Extension, Themelet, Event
 from shimpy.core.models import Image
-from shimpy.core.utils import SparseList
+from shimpy.core.utils import SparseList, make_link
 
 import os
 import logging
 import re
 from webhelpers.html import literal
+from .theme import IndexTheme
 
 log = logging.getLogger(__name__)
 
@@ -40,76 +41,10 @@ class PostListBuildingEvent(Event):
         self.parts.insert(position, html)
 
 
-class IndexTheme(Themelet):
-    def set_page(self, page, page_number, total_pages, search_terms):
-        self.page_number = page_number
-        self.total_pages = total_pages
-        self.search_terms = search_terms
-
-    def display_intro(self, page):
-        text = literal("""
-<div style='text-align: left;'>
-<p>The first thing you'll probably want to do is create a new account; note
-that the first account you create will by default be marked as the board's
-administrator, and any further accounts will be regular users.
-
-<p>Once logged in you can play with the settings, install extra features,
-and of course start organising your images :-)
-
-<p>This message will go away once your first image is uploaded~
-</div>
-""")
-        page.title = "Welcome to Shimpy"
-        page.heading = "Welcome to Shimpy"
-        page.add_block(Block("Installation Succeeded!", text))
-
-    def display_page(self, page, images):
-        config = None
-
-        if not self.search_terms:
-            query = None
-            page_title = config.get_string("title")
-
-        else:
-            search_string = " ".join(self.search_terms)  # TODO: Tag.join()?
-            page_title = search_string
-
-            if images:
-                page.subheading = "Page %d / %d" % (self.page_number, self.total_pages)
-
-        page.title = page_title
-        page.heading = page_title
-        page.add_block(Block("Navigation", self.build_navigation(), "left", 0))
-
-        if images:
-            page.add_block(Block("Images", self.build_table(images, ("#search="+query) if query else None), "main", 10, "image-list"))
-            self.display_paginatior(page, "post/list/"+query if query else "post/list", null, self.page_number, self.total_pages)
-        else:
-            self.display_error(page, 404, "No Images Found", "No images were found to match the search criteria")
-
-    def display_admin_block(self, page, parts):
-        page.add_block(Block("List Controls", literal("<br>").join(parts), "left", 50))
-
-    def build_navigation(self):
-        prev = self.page_number - 1
-        next = self.page_number + 1
-
-        tags = " ".join(self.search_terms)  # TODO: Tag.join()?
-        # TODO
-
-        return "Nav stuff"
-
-    def build_table(self, images, query):
-        table = literal("""<div class="shm-image-list" data-query="%s">""") % query
-        for image in images:
-            table += self.build_thumb_html(image)
-        table += literal( "</table>")
-        return table
-
-
 class Index(Extension):
     def __init__(self):
         self.theme = IndexTheme()
+        #self.theme = Template(filename='shimpy/ext/index/theme.mako')
 
     def onInitExt(self, event):
         # event.context.config.set_default_int("index_images", 24)
@@ -124,13 +59,13 @@ class Index(Extension):
         send_event = event.context.server.send_event
 
         if event.page_matches("post/list"):
-            if False and "search" in request.POST:
-                search = request.POST["search"]
+            if "search" in request.args:
+                search = request.args["search"]
                 page.mode = "redirect"
                 if search:
-                    page.redirect = make_link("post/list/1")
-                else:
                     page.redirect = make_link("post/list/" + search + "/1")
+                else:
+                    page.redirect = make_link("post/list/1")
                 return
 
             search_terms = event.get_search_terms()

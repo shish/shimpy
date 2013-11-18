@@ -45,11 +45,11 @@ class ViewImageTheme(Themelet):
     def display_page(self, page, image, parts):
         page.heading = " ".join([t.name for t in image.tags])
         page.title = "Image %d: %s" % (image.id, page.heading)
-        page.add_html_header(literal("<meta name=\"keywords\" content=\"%s\">") % page.heading.replace(" ", ", "))
-        page.add_html_header(literal("<meta property=\"og:title\" content=\"%s\">") % page.heading.replace(" ", ", "))
+        page.add_html_header(literal("<meta name=\"keywords\" content=\"%s\">") % image.tags_plain_text.replace(" ", ", "))
+        page.add_html_header(literal("<meta property=\"og:title\" content=\"%s\">") % image.title)
         page.add_html_header(literal("<meta property=\"og:type\" content=\"article\">"))
-        page.add_html_header(literal("<meta property=\"og:image\" content=\"%s\">") % image.get_thumb_link())
-        page.add_html_header(literal("<meta property=\"og:url\" content=\"%s\">") % image.get_page_link())
+        page.add_html_header(literal("<meta property=\"og:image\" content=\"%s\">") % image.thumb_url)
+        page.add_html_header(literal("<meta property=\"og:url\" content=\"%s\">") % image.page_url)
         # TODO: navigation
         # TODO: image info
         page.add_block(Block("Image Found: %s" % image.fingerprint, "image goes here"))
