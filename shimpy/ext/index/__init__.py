@@ -1,6 +1,7 @@
 from shimpy.core import Extension, Themelet, Event
 from shimpy.core.models import Image
 from shimpy.core.utils import SparseList, make_link
+from shimpy.core.context import context
 
 import os
 import logging
@@ -12,8 +13,7 @@ log = logging.getLogger(__name__)
 
 
 class SearchTermParseEvent(Event):
-    def __init__(self, context, term):
-        self.context = context
+    def __init__(self, term):
         self.term = term
         self.querylets = []
 
@@ -32,8 +32,7 @@ class SearchTermParseException(Exception):
 
 
 class PostListBuildingEvent(Event):
-    def __init__(self, context, search_terms):
-        self.context = context
+    def __init__(self, search_terms):
         self.search_terms = search_terms
         self.parts = SparseList()
 
@@ -47,16 +46,16 @@ class Index(Extension):
         #self.theme = Template(filename='shimpy/ext/index/theme.mako')
 
     def onInitExt(self, event):
-        # event.context.config.set_default_int("index_images", 24)
-        # event.context.config.set_default_bool("index_tips", True)
+        # context.config.set_default_int("index_images", 24)
+        # context.config.set_default_bool("index_tips", True)
         pass
 
     def onPageRequest(self, event):
-        page = event.context.page
-        user = event.context.user
-        request = event.context.request
-        database = event.context.database
-        send_event = event.context.server.send_event
+        page = context.page
+        user = context.user
+        request = context.request
+        database = context.database
+        send_event = context.server.send_event
 
         if event.page_matches("post/list"):
             if "search" in request.args:
@@ -90,7 +89,7 @@ class Index(Extension):
                 page.redirect = make_link("post/view/" + images[0].id)
 
             else:
-                plbe = PostListBuildingEvent(event.context, search_terms)
+                plbe = PostListBuildingEvent(search_terms)
                 send_event(plbe)
 
                 self.theme.set_page(page, page_number, total_pages, search_terms)

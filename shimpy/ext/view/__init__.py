@@ -1,19 +1,19 @@
 from shimpy.core import Block, Event, Extension, Themelet
 from shimpy.core.models import Image
+from shimpy.core.context import context
 from webhelpers.html import literal
 
 
 class DisplayingImageEvent(Event):
-    def __init__(self, context, image):
-        Event.__init__(self, context)
+    def __init__(self, image):
+        Event.__init__(self)
         self.image = image
 
 
 class ImageInfoBoxBuildingEvent(Event):
-    def __init__(self, context, image):
-        Event.__init__(self, context)
+    def __init__(self, image):
+        Event.__init__(self)
         self.image = image
-        self.user = context.user
         self.parts = {}
 
     def add_part(self, html, position):
@@ -23,16 +23,15 @@ class ImageInfoBoxBuildingEvent(Event):
 
 
 class ImageInfoSetEvent(Event):
-    def __init__(self, context, image):
-        Event.__init__(self, context)
+    def __init__(self, image):
+        Event.__init__(self)
         self.image = image
 
 
 class ImageAdminBlockBuildingEvent(Event):
-    def __init__(self, context, image):
-        Event.__init__(self, context)
+    def __init__(self, image):
+        Event.__init__(self)
         self.image = image
-        self.user = context.user
         self.parts = {}
 
     def add_part(self, html, position):
@@ -63,10 +62,10 @@ class ViewImage(Extension):
         self.theme = ViewImageTheme()
 
     def onPageRequest(self, event):
-        page = event.context.page
-        user = event.context.user
-        database = event.context.database
-        send_event = event.context.server.send_event
+        page = context.page
+        user = context.user
+        database = context.database
+        send_event = context.server.send_event
 
         if event.page_matches("post/prev") or event.page_matches("post/next"):
             # TODO
@@ -77,27 +76,27 @@ class ViewImage(Extension):
 
             image = database.query(Image).get(image_id)
             if image:
-                send_event(DisplayingImageEvent(event.context, image))
+                send_event(DisplayingImageEvent(image))
             else:
                 self.theme.display_error(page, 404, "Image not found", "No image in the database has the ID #%d" % image_id)
 
         if event.page_matches("post/set"):
-            image_id = int(event.context.request.POST["image_id"])
+            image_id = int(context.request.POST["image_id"])
 
-            send_event(ImageInfoSetEvent(event.context, image))
+            send_event(ImageInfoSetEvent(image))
 
             page.mode = "redirect"
-            page.redirect = make_link("post/view/%d" % image_id, event.context.request.POST["query"])
+            page.redirect = make_link("post/view/%d" % image_id, context.request.POST["query"])
 
     def onDisplayingImage(self, event):
-        user = event.context.user
+        user = context.user
         image = event.image
-        send_event = event.context.server.send_event
+        send_event = context.server.send_event
 
-        iibbe = ImageInfoBoxBuildingEvent(event.context, image)
+        iibbe = ImageInfoBoxBuildingEvent(image)
         send_event(iibbe)
-        self.theme.display_page(event.context.page, event.image, iibbe.parts)
+        self.theme.display_page(context.page, event.image, iibbe.parts)
 
-        iabbe = ImageAdminBlockBuildingEvent(event.context, image)
+        iabbe = ImageAdminBlockBuildingEvent(image)
         send_event(iabbe)
-        self.theme.display_admin_block(event.context.page, iabbe.parts)
+        self.theme.display_admin_block(context.page, iabbe.parts)

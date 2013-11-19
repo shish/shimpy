@@ -1,18 +1,14 @@
+from shimpy.core.context import context
+
 
 class Event(object):
     """
-    A basic event class, just carries a Context around with it
-
-    >>> from mock import Mock
-    >>> ctx = Mock()
-    >>> e = Event(ctx)
-    >>> e.context == ctx
-    True
+    A basic event class
 
     Devs are expected to subclass this to send events around
     """
-    def __init__(self, context):
-        self.context = context
+    def __init__(self):
+        pass
 
 
 class InitExtEvent(Event):
@@ -29,7 +25,7 @@ class PageRequestEvent(Event):
     A PageRequestEvent happens when a user (browser, robot, whatever)
     requests a page via HTTP(S)
     """
-    def __init__(self, context):
+    def __init__(self):
         """
         >>> from mock import Mock
         >>> pre = PageRequestEvent(Mock(request=Mock(path="/"), config={"front_page": "post/list"}))
@@ -39,8 +35,8 @@ class PageRequestEvent(Event):
         >>> pre.page_matches("post/list")
         True
         """
-        Event.__init__(self, context)
-        self.path = self.context.request.path.lstrip("/")
+        Event.__init__(self)
+        self.path = context.request.path.lstrip("/")
         self.args = []
 
         if not self.path:
@@ -112,7 +108,7 @@ class PageRequestEvent(Event):
         return page_number
 
     def get_page_size(self):
-        return self.context.config.get("index_images", 24)
+        return context.config.get("index_images", 24)
 
 
 class CommandEvent(Event):

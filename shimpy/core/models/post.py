@@ -1,5 +1,6 @@
 from .meta import *
 from shimpy.core.utils import make_link
+from shimpy.core.context import context
 #from votabo.lib.balance import balance
 
 
@@ -32,15 +33,19 @@ class Post(Base):
 
     @staticmethod
     def count_pages(search_terms):
+        return Post.count_images(search_terms) / int(context.config.get("index_size", 24))
+
+    @staticmethod
+    def count_images(search_terms):
         return Post.find_all_images(search_terms).count()
 
     @staticmethod
-    def find_images(start, offset, search_terms):
-        return Post.find_all_images(search_terms)[start:start + offset]
+    def find_images(offset, limit, search_terms):
+        return Post.find_all_images(search_terms).offset(offset).limit(limit).all()  # [start:start + offset]
 
     @staticmethod
     def find_all_images(search_terms):
-        return DBSession.query(Post).limit(100)
+        return context.database.query(Post).limit(100)
 
     @property
     def thumb_url(self):

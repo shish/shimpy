@@ -1,5 +1,5 @@
 from shimpy.core.page import Page
-from shimpy.core.context import Context
+from shimpy.core.context import context
 from shimpy.core.event import Event, PageRequestEvent
 from shimpy.core.extension import Extension
 from shimpy.core.database import connect, Session
@@ -64,11 +64,11 @@ class Shimpy(object):
 
     def application(self, environment, start_response):
         sess = Session()
-        ctx = Context(self, sess, environment)
+        context.configure(self, sess, environment)
 
         try:
-            self.send_event(PageRequestEvent(ctx))
-            ctx.page.render(ctx)
+            self.send_event(PageRequestEvent())
+            context.page.render()
             Session.commit()
         except:
             Session.rollback()
@@ -76,8 +76,8 @@ class Shimpy(object):
         finally:
             Session.remove()
 
-        start_response(str(ctx.page.status) + " OK?", ctx.page.http_headers)
-        return [ctx.page.data]
+        start_response(str(context.page.status) + " OK?", context.page.http_headers)
+        return [context.page.data]
 
     ###################################################################
     # Page Processing
@@ -90,7 +90,7 @@ class Shimpy(object):
             if hasattr(ext, method_name):
                 getattr(ext, method_name)(event)
 
-        event.context._event_count += 1
+        context._event_count += 1
 
 
 def main():

@@ -2,7 +2,9 @@ from mako.template import Template
 from webhelpers.html import literal
 from glob import glob
 from datetime import datetime, timedelta
+
 from shimpy.core.utils import SparseList
+from shimpy.core.context import context
 
 
 class Page(object):
@@ -50,7 +52,7 @@ class Page(object):
     def add_block(self, block):
         self.blocks.append(block)
 
-    def render(self, context):
+    def render(self):
         self.add_http_header("Content-type", self.content_type)
         self.add_http_header("X-Powered-By", "Shimpy Alpha")
 

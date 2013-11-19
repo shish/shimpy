@@ -1,3 +1,5 @@
+from shimpy.core.context import context
+
 
 class Extension(object):
     priority = 50
@@ -23,9 +25,9 @@ class FormatterExtension(Extension):
 
 class DataHandlerExtension(Extension):
     def onDataUpload(event):
-        user = event.context.user
-        database = event.context.database
-        send_event = event.context.server.send_event
+        user = context.user
+        database = context.database
+        send_event = context.server.send_event
 
         if self.is_supported_ext(event.type) and self.check_contents(event.tmpname):
             if not move_upload_to_archive(event):
@@ -50,7 +52,7 @@ class DataHandlerExtension(Extension):
                 if not image:
                     raise UploadException("Data handler failed to create image object from data")
 
-                ire = ImageReplaceEvent(event.context, image_id, image)
+                ire = ImageReplaceEvent(image_id, image)
                 send_event(ire)
                 event.image_id = image_id
 
@@ -59,7 +61,7 @@ class DataHandlerExtension(Extension):
                 if not image:
                     raise UploadException("Data handler failed to create image object from data")
 
-                iae = ImageAdditionEvent(event.context, image)
+                iae = ImageAdditionEvent(image)
                 send_event(iae)
                 event.image_id = iae.image.id
 
@@ -72,9 +74,8 @@ class DataHandlerExtension(Extension):
             self.create_thumb(event.hash)
 
     def onDisplayingImage(self, event):
-        page = event.context.page
         if self.is_supported_ext(event.image.ext):
-            self.theme.display_image(page, event.image)
+            self.theme.display_image(context.page, event.image)
 
 
     def is_supported_ext(self, ext):
