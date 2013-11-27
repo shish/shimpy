@@ -45,5 +45,15 @@ setup(name='Shimpy',
       entry_points="""\
       [console_scripts]
       start-shimpy = shimpy:main
+
+      [shimpy.extensions]
+      alias_editor = shimpy.ext.alias_editor:AliasEditor
+      ban_words = shimpy.ext.ban_words:BanWords
+      bbcode = shimpy.ext.bbcode:BBCode
+      blocks = shimpy.ext.blocks:Blocks
+      handle_404 = shimpy.ext.handle_404:Handle404
+      hello = shimpy.ext.hello:Hello
+      index = shimpy.ext.index:Index
+      view = shimpy.ext.view:ViewImage
       """,
       )

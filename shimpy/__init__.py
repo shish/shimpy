@@ -7,6 +7,7 @@ from shimpy.core.database import connect, Session
 from ConfigParser import SafeConfigParser
 
 import logging
+from pkg_resources import iter_entry_points
 
 log = logging.getLogger(__name__)
 
@@ -30,19 +31,12 @@ class Shimpy(object):
         self.load_themelets()
 
     def load_extensions(self):
-        for name in self.hard_config.get("extensions", "list").split(","):
-            log.info("Loading extension: %(extension)s", {"extension": name})
-
-        from shimpy.ext.hello import Hello
-        from shimpy.ext.view import ViewImage
-        from shimpy.ext.handle_404 import Handle404
-        from shimpy.ext.index import Index
-        self.extensions = [
-            #Hello(),
-            ViewImage(),
-            Index(),
-            Handle404(),
-        ]
+        self.extensions = []
+        for entry_point in iter_entry_points("shimpy.extensions"):
+            log.info("Loading extension: %(extension)s", {"extension": entry_point.name})
+            self.extensions.append(entry_point.load())
+        #for name in self.hard_config.get("extensions", "list").split(","):
+        #    log.info("Loading extension: %(extension)s", {"extension": name})
         self.extensions = sorted(self.extensions)
 
     def load_hard_config(self):
