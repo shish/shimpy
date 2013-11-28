@@ -55,5 +55,6 @@ setup(name='Shimpy',
       hello = shimpy.ext.hello:Hello
       index = shimpy.ext.index:Index
       view = shimpy.ext.view:ViewImage
+      statsd = shimpy.ext.statsd:StatsD
       """,
       )

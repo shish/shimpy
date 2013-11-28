@@ -9,6 +9,12 @@ def _get_user(database, request):
     return database.query(User).first()
 
 
+class Cache(object):
+    def __init__(self):
+        self.hit_count = 0
+        self.miss_count = 0
+
+
 class Context(threading.local):
     """
     A class to carry round all the things that are important for a given request;
@@ -24,6 +30,7 @@ class Context(threading.local):
         self.user = _get_user(self.database, self.request)
         self.config = server.config
         self.hard_config = server.hard_config
+        self.cache = Cache()
 
         self._event_count = 0
 
