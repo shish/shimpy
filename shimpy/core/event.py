@@ -28,7 +28,10 @@ class PageRequestEvent(Event):
     def __init__(self):
         """
         >>> from mock import Mock
-        >>> pre = PageRequestEvent(Mock(request=Mock(path="/"), config={"front_page": "post/list"}))
+        >>> context.request = Mock(path="/")
+        >>> context.config = {"front_page": "post/list"}
+
+        >>> pre = PageRequestEvent()
 
         If the path is blank, the configured front_page will be used
 
@@ -45,7 +48,9 @@ class PageRequestEvent(Event):
     def page_matches(self, page):
         """
         >>> from mock import Mock
-        >>> pre = PageRequestEvent(Mock(request=Mock(path="/foo/bar/1")))
+        >>> context.request = Mock(path="/foo/bar/1")
+
+        >>> pre = PageRequestEvent()
 
         Path elements are matched from the front
 
@@ -66,7 +71,8 @@ class PageRequestEvent(Event):
     def get_arg(self, idx):
         """
         >>> from mock import Mock
-        >>> pre = PageRequestEvent(Mock(request=Mock(path="/foo/bar/1")))
+        >>> context.request = Mock(path="/foo/bar/1")
+        >>> pre = PageRequestEvent()
 
         Any path elements that aren't part of the match are considered arguments
 
@@ -80,7 +86,8 @@ class PageRequestEvent(Event):
     def count_args(self):
         """
         >>> from mock import Mock
-        >>> pre = PageRequestEvent(Mock(request=Mock(path="/foo/bar/1")))
+        >>> context.request = Mock(path="/foo/bar/1")
+        >>> pre = PageRequestEvent()
 
         Count the number of path parts that weren't matched
 

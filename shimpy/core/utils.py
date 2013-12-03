@@ -31,6 +31,9 @@ class SparseList(object):
             pos = pos + (1.0/128.0)
         self.values[pos] = val
 
+    def __getitem__(self, pos):
+        return list(self)[pos]
+
     def __iter__(self):
         keys = sorted(self.values.keys())
         for key in keys:
