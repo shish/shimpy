@@ -56,5 +56,6 @@ setup(name='Shimpy',
       index = shimpy.ext.index:Index
       view = shimpy.ext.view:ViewImage
       statsd = shimpy.ext.statsd:StatsD
+      rss_images = shimpy.ext.rss_images.RSSImages
       """,
       )
