@@ -1,12 +1,13 @@
 from shimpy.core.page import Page
 from shimpy.core.context import context
-from shimpy.core.event import Event, PageRequestEvent
+from shimpy.core.event import Event, PageRequestEvent, InitExtEvent
 from shimpy.core.extension import Extension
 from shimpy.core.database import connect, Session
 
 from ConfigParser import SafeConfigParser
 
 import logging
+import time
 from pkg_resources import iter_entry_points
 
 log = logging.getLogger(__name__)
@@ -34,7 +35,7 @@ class Shimpy(object):
         self.extensions = []
         for entry_point in iter_entry_points("shimpy.extensions"):
             log.info("Loading extension: %(extension)s", {"extension": entry_point.name})
-            self.extensions.append(entry_point.load())
+            self.extensions.append(entry_point.load()())
         #for name in self.hard_config.get("extensions", "list").split(","):
         #    log.info("Loading extension: %(extension)s", {"extension": name})
         self.extensions = sorted(self.extensions)
@@ -61,6 +62,7 @@ class Shimpy(object):
         context.configure(self, sess, environment)
 
         try:
+            self.send_event(InitExtEvent())
             self.send_event(PageRequestEvent())
             context.page.render()
             Session.commit()
@@ -78,13 +80,19 @@ class Shimpy(object):
     ###################################################################
 
     def send_event(self, event):
+        context._event_depth += 1
+
         log.info("Sending %(event)s", {"event": event.__class__.__name__})
         method_name = "on" + event.__class__.__name__.replace("Event", "")
         for ext in self.extensions:
+            t2 = time.time()
             if hasattr(ext, method_name):
                 getattr(ext, method_name)(event)
+            print "%-25s %-25s %-5.3f" % (event.__class__.__name__, ext.__class__.__name__, time.time() - t2)
+        log.info("Ending %(event)s", {"event": event.__class__.__name__})
 
         context._event_count += 1
+        context._event_depth -= 1
 
 
 def main():

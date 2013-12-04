@@ -2,6 +2,7 @@ from shimpy.core import Extension
 from shimpy.core.context import context
 
 import socket
+from time import time
 
 
 def dstat(name, val):
@@ -27,17 +28,17 @@ class StatsD(Extension):
 
     def __stats(self, type_):
         page_time = time() - context._load_start
-        context._stats["shimpy.%s.hits" % type_] = "1|c";
-        context._stats["shimpy.%s.time" % type_] = "%f|ms" % page_time;
-        #context._stats["shimpy.%s.memory" % type_] = "1|c";
-        #context._stats["shimpy.%s.files" % type_] = "1|c";
-        context._stats["shimpy.%s.queries" % type_] = "%d|c" % context._queries;
-        context._stats["shimpy.%s.events" % type_] = "%d|c" % context._events;
-        context._stats["shimpy.%s.cache-hits" % type_] = "%d|c" % context.cache.hit_count;
-        context._stats["shimpy.%s.cache-misses" % type_] = "%d|c" % context.cache.miss_count;
+        context._stats["shimpy.%s.hits" % type_] = "1|c"
+        context._stats["shimpy.%s.time" % type_] = "%f|ms" % page_time
+        #context._stats["shimpy.%s.memory" % type_] = "1|c"
+        #context._stats["shimpy.%s.files" % type_] = "1|c"
+        context._stats["shimpy.%s.queries" % type_] = "%d|c" % context._query_count
+        context._stats["shimpy.%s.events" % type_] = "%d|c" % context._event_count
+        context._stats["shimpy.%s.cache-hits" % type_] = "%d|c" % context.cache.hit_count
+        context._stats["shimpy.%s.cache-misses" % type_] = "%d|c" % context.cache.miss_count
 
     def __send_stats(self, data, sample_rate):
-        host = context.hard_config.get("statsd.host")
+        host = context.hard_config.get("statsd", "host")
         if not host:
             return
 
@@ -62,6 +63,7 @@ class StatsD(Extension):
 
     def onInitExt(self, event):
         context._load_start = time()
+        context._stats = {}
 
     def onPageRequest(self, event):
         self.__stats("overall")

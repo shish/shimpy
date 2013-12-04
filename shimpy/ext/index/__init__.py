@@ -1,7 +1,9 @@
 from shimpy.core import Extension, Themelet, Event
-from shimpy.core.models import Image
+from shimpy.core.models import Image, Tag
 from shimpy.core.utils import SparseList, make_link
 from shimpy.core.context import context
+
+from sqlalchemy import not_
 
 import os
 import logging
@@ -13,9 +15,15 @@ log = logging.getLogger(__name__)
 
 
 class SearchTermParseEvent(Event):
-    def __init__(self, term):
+    def __init__(self, results, term, negative):
+        self.results = results
         self.term = term
-        self.querylets = []
+        self.negative = negative
+
+    def add_filter(self, f):
+        if self.negative:
+            f = not_(f)
+        self.results = self.results.filter(f)
 
     def is_querylet_set(self):
         return len(self.querylets) > 0
@@ -108,5 +116,15 @@ class Index(Extension):
         event.panel.add_block(sb)
 
     def onSearchTermParse(self, event):
-        # TODO
-        pass
+        if re.match("^[a-zA-Z0-9]+$", event.term):
+            import sqlalchemy
+            tag = Tag.get(sqlalchemy.func.lower(event.term))
+            if tag:
+                log.info("Adding filter for plain tag: %s", event.term)
+                event.add_filter(Image.tags.contains(tag))
+            else:
+                if not event.negative:
+                    # if the tag is negative, it doesn't
+                    # matter that we couldn't find it
+                    log.info("Tag %s not found", event.term)
+                    event.add_filter(False)

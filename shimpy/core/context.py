@@ -14,6 +14,12 @@ class Cache(object):
         self.hit_count = 0
         self.miss_count = 0
 
+    def get(self, key):
+        return None
+
+    def set(self, key, value, timeout):
+        pass
+
 
 class Context(threading.local):
     """
@@ -33,6 +39,8 @@ class Context(threading.local):
         self.cache = Cache()
 
         self._event_count = 0
+        self._query_count = 0
+        self._event_depth = 0
 
     def get_debug_info(self):
         return literal("<br>Events sent: %d") % self._event_count

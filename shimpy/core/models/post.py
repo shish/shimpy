@@ -3,6 +3,10 @@ from shimpy.core.utils import make_link
 from shimpy.core.context import context
 #from votabo.lib.balance import balance
 
+import logging
+
+log = logging.getLogger(__name__)
+
 
 CONF_THUMB_WIDTH = 192
 CONF_THUMB_HEIGHT = 192
@@ -45,7 +49,30 @@ class Post(Base):
 
     @staticmethod
     def find_all_images(search_terms):
-        return context.database.query(Post).limit(100)
+        db = context.database
+
+        if context.config.get("speed_hax") and len(search_terms) > 3 and not context.user.can("big_search"):
+            raise Exception("Anonymous users may only search for up to 3 tags at a time")
+
+        results = db.query(Post)
+
+        for term in search_terms:
+            from shimpy.ext.index import SearchTermParseEvent
+            negative = term.startswith("-")
+            if negative:
+                term = term[1:]
+            original_results = results
+            stpe = SearchTermParseEvent(results, term, negative)
+            context.server.send_event(stpe)
+            results = stpe.results
+
+            if results == original_results:
+                raise Exception("%s not a valid search term" % term)
+
+        #results = results.order_by(Post.id.desc())
+        results = results.limit(100)  # during dev
+        log.info("Image search: %s", results)
+        return results
 
     @property
     def thumb_url(self):
@@ -149,7 +176,7 @@ class Tag(Base):
     @staticmethod
     def get(name):
         name = Alias.resolve(name)
-        return DBSession.query(Tag).filter(Tag.name.ilike(name)).first()
+        return context.database.query(Tag).filter(Tag.name.ilike(name)).first()
 
     @staticmethod
     def get_or_create(name):
@@ -159,7 +186,7 @@ class Tag(Base):
     def split(string):
         return string.split()
 
-    def is_plain_tag(self):
+    def is_plain(self):
         """
         If this is a regular tag
 

@@ -1,5 +1,8 @@
 from shimpy.core import Extension, Block
 from shimpy.core.database import Base
+from shimpy.core.context import context
+
+from fnmatch import fnmatch
 from sqlalchemy import Column, Integer, String, Unicode, UnicodeText
 
 
