@@ -20,6 +20,7 @@ class PixelFileHandlerTheme(Themelet):
         )
         context.page.add_block(Block("Image", img, "main", 10))
 
+
 class PixelFileHandler(DataHandlerExtension):
     def __init__(self):
         self.theme = PixelFileHandlerTheme()

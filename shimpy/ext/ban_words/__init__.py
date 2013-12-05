@@ -1,6 +1,9 @@
 from shimpy.core import Extension, Event
 from shimpy.core.context import context
 
+from textwrap import dedent
+import re
+
 
 class BanWords(Extension):
     """
@@ -37,10 +40,10 @@ class BanWords(Extension):
         """
         # TODO: dedent
         if "banned_words" not in context.config:
-            context.config["banned_words"] = """
+            context.config["banned_words"] = dedent("""
                 viagra
                 xanax
-            """
+                """)
 
     def onCommentPosting(self, event):
         self.__test(event.comment, CommentPostingException("Comment contains banned terms"))
@@ -59,6 +62,28 @@ class BanWords(Extension):
         event.panel.add_block(sb)
 
     def __test(self, text, exc):
+        """
+        >>> context.config = {"banned_words": \"\"\"
+        ... viagra
+        ... /r[aeiou]gex/
+        ... \"\"\"}
+        >>> bw = BanWords()
+        >>> t = bw._BanWords__test
+        >>> t("ok text", Exception("ex"))
+        >>> t("vIaGrA", Exception("ex"))
+        Traceback (most recent call last):
+            ...
+        Exception: ex
+        >>> t("regex", Exception("ex"))
+        Traceback (most recent call last):
+            ...
+        Exception: ex
+        >>> t("rogex", Exception("ex"))
+        Traceback (most recent call last):
+            ...
+        Exception: ex
+        >>> t("rygex", Exception("ex"))
+        """
         banned_list = context.config.get("banned_words").lower().split("\n")
         text = text.lower()
 
@@ -71,10 +96,11 @@ class BanWords(Extension):
 
             # regex
             elif banned_word[0] == "/":
-                # TODO: regex
-                pass
+                banned_regex = banned_word[1:-1]
+                if re.match(banned_regex, text):
+                    raise exc
 
             # plain text
             else:
-                if bannwd_word in text:
+                if banned_word in text:
                     raise exc

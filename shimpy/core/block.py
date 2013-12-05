@@ -1,5 +1,6 @@
 import hashlib
-from webhelpers.html import literal
+from webhelpers.html import literal, HTML
+
 
 class Block(object):
     def __init__(self, header, body, section="main", position="0", class_=None):
@@ -43,5 +44,5 @@ class Block(object):
 
 class NavBlock(Block):
     def __init__(self):
-        body = literal("""<a href="%s">Index</a>""") % "/"  # TODO: get main page
+        body = HTML.a("/", href="%s")  # TODO: get main page
         Block.__init__(self, "Navigation", body, "left", 0)
