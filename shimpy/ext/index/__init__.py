@@ -116,7 +116,7 @@ class Index(Extension):
         event.panel.add_block(sb)
 
     def onSearchTermParse(self, event):
-        if re.match("^[a-zA-Z0-9]+$", event.term):
+        if re.match("^[a-zA-Z0-9_-]+$", event.term):
             import sqlalchemy
             tag = Tag.get(sqlalchemy.func.lower(event.term))
             if tag:

@@ -1,7 +1,7 @@
 from .meta import *
 from shimpy.core.utils import make_link
 from shimpy.core.context import context
-#from votabo.lib.balance import balance
+from shimpy.core.balance import balance
 
 import logging
 
@@ -28,6 +28,7 @@ class Post(Base):
     posted = Column(DateTime, nullable=False, default=func.now())
     source = Column(Unicode)
     locked = Column(Boolean, nullable=False, default=False)
+    ext = Column(String)
 
     user = relationship("User")
     tags = relationship("Tag", secondary=map_post_tag, order_by=desc("tags.count"))
@@ -77,13 +78,19 @@ class Post(Base):
     @property
     def thumb_url(self):
         return self.parse_link_template(
-            ("/thumbs/$(hash)s/thumb.jpg").replace("$", "%")
+            context.config.get(
+                "image_tlink",
+                "/thumbs/$(hash)s/thumb.jpg"
+            ).replace("$", "%")
         )
 
     @property
     def image_url(self):
         return self.parse_link_template(
-            ("/images/$(hash)s/$(id)s$$20-$$20$(tags)s.$(ext)s").replace("$", "%")
+            context.config.get(
+                "image_ilink",
+                "/images/$(hash)s/$(id)s$$20-$$20$(tags)s.$(ext)s"
+            ).replace("$", "%")
         )
 
     @property
@@ -98,7 +105,7 @@ class Post(Base):
             #"base": self.,
             "ext": "jpg",  # FIXME
         }
-        #tmpl = balance(tmpl)
+        tmpl = balance(tmpl)
         return tmpl
 
     @property

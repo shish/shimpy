@@ -22,6 +22,9 @@ requires = [
     'unittest2',
     'mock',
     'werkzeug',
+
+    # ext.handle_pixel
+    'pillow',
     ]
 
 setup(name='Shimpy',
@@ -44,7 +47,7 @@ setup(name='Shimpy',
       install_requires=requires,
       entry_points="""\
       [console_scripts]
-      start-shimpy = shimpy:main
+      start-shimpy = shimpy.core.server:main
 
       [shimpy.extensions]
       alias_editor = shimpy.ext.alias_editor:AliasEditor
@@ -56,6 +59,7 @@ setup(name='Shimpy',
       index = shimpy.ext.index:Index
       view = shimpy.ext.view:ViewImage
       statsd = shimpy.ext.statsd:StatsD
-      rss_images = shimpy.ext.rss_images.RSSImages
+      rss_images = shimpy.ext.rss_images:RSSImages
+      handle_pixel = shimpy.ext.handle_pixel:PixelFileHandler
       """,
       )

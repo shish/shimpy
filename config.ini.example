@@ -10,3 +10,6 @@ list = hello
 
 [cache]
 http = on
+
+[forced_config]
+; put things here to override the database config

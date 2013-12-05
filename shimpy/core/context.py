@@ -2,6 +2,7 @@ from werkzeug.wrappers import Request
 from webhelpers.html import literal
 
 import threading
+from time import time
 
 
 def _get_user(database, request):
@@ -38,12 +39,25 @@ class Context(threading.local):
         self.hard_config = server.hard_config
         self.cache = Cache()
 
+        self._load_start = time()
         self._event_count = 0
         self._query_count = 0
         self._event_depth = 0
 
     def get_debug_info(self):
-        return literal("<br>Events sent: %d") % self._event_count
+        from shimpy.core import __version__
+        return literal("""
+            <br>
+            Time: %.2f -
+            Events sent: %d -
+            %d cache hits and %d misses -
+            Shimpy version %s
+        """) % (
+            time() - self._load_start,
+            self._event_count,
+            self.cache.hit_count, self.cache.miss_count,
+            __version__,
+        )
 
 
 context = Context()

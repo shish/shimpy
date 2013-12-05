@@ -51,7 +51,6 @@ class ViewImageTheme(Themelet):
         page.add_html_header(literal("<meta property=\"og:url\" content=\"%s\">") % image.page_url)
         # TODO: navigation
         # TODO: image info
-        page.add_block(Block("Image Found: %s" % image.fingerprint, "image goes here"))
 
     def display_admin_block(self, page, parts):
         page.add_block(Block("Image Controls", "<br>".join(parts), "left", 50))

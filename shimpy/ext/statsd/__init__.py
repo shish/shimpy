@@ -62,7 +62,6 @@ class StatsD(Extension):
             pass
 
     def onInitExt(self, event):
-        context._load_start = time()
         context._stats = {}
 
     def onPageRequest(self, event):
