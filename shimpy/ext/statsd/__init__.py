@@ -38,7 +38,11 @@ class StatsD(Extension):
         context._stats["shimpy.%s.cache-misses" % type_] = "%d|c" % context.cache.miss_count
 
     def __send_stats(self, data, sample_rate):
-        host = context.hard_config.get("statsd", "host")
+        try:
+            host = context.hard_config.get("statsd", "host")
+        except Exception:
+            return
+
         if not host:
             return
 
