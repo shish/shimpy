@@ -70,7 +70,7 @@ class Post(Base):
             if results == original_results:
                 raise Exception("%s not a valid search term" % term)
 
-        #results = results.order_by(Post.id.desc())
+        results = results.order_by(Post.id.desc())
         results = results.limit(100)  # during dev
         log.info("Image search: %s", results)
         return results

@@ -1,4 +1,4 @@
-from shimpy.core import Extension, __version__
+from shimpy.core import Extension, __version__, Themelet
 from shimpy.core.utils import make_link
 from shimpy.core.context import context
 from shimpy.core.models import Image
@@ -15,6 +15,9 @@ class RSSImages(Extension):
     License: GPLv2
     Description: Self explanatory
     """
+    def __init__(self):
+        self.theme = Themelet()
+
     def onPostListBuilding(self, event):
         """
         >>> from shimpy.ext.index import PostListBuildingEvent
@@ -124,7 +127,13 @@ class RSSImages(Extension):
         for image in images:
             link = make_link("post/view/%d" % image.id)
             posted = ""
-            content = ""
+            content = ("""
+                <p>%(thumb)s</p>
+                <p>Uploaded by %(name)s</p>
+            """) % {
+                "thumb": self.theme.build_thumb_html(image),
+                "name": image.user.username,
+            }
 
             item = ET.SubElement(channel, "item")
             ET.SubElement(item, "title").text = "%d - %s" % (image.id, image.tags_plain_text)

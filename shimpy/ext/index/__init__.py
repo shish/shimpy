@@ -116,6 +116,16 @@ class Index(Extension):
         event.panel.add_block(sb)
 
     def onSearchTermParse(self, event):
+        # TODO: search by tag count
+        # TODO: search by ratio
+        # TODO: search by filesize
+        # TODO: search by id
+        # TODO: search by hash / md5
+        # TODO: search by filetype / ext
+        # TODO: search by file name
+        # TODO: search by source
+        # TODO: search by posted
+        # TODO: search by size
         if re.match("^[a-zA-Z0-9_-]+$", event.term):
             import sqlalchemy
             tag = Tag.get(sqlalchemy.func.lower(event.term))
