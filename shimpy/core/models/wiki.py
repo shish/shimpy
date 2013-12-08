@@ -10,7 +10,7 @@ class WikiPage(Base):
     title = Column(Unicode, nullable=False)
     body = Column(Unicode, nullable=False)
     revision = Column(Integer, nullable=False, default=1)
-    posted = Column("date", DateTime, nullable=False, default=func.now())
+    posted = Column("date", DateTime(timezone=True), nullable=False, default=func.now())
     locked = Column(Boolean, nullable=False, default=False)
 
     user = relationship("User")

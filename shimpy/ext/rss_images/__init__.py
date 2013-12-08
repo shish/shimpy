@@ -115,10 +115,11 @@ class RSSImages(Extension):
         })
 
         channel = ET.SubElement(root, 'channel')
-        ET.SubElement(channel, 'title').text = "Title"
+        ET.SubElement(channel, 'title').text = context.config.get("title")
         ET.SubElement(channel, 'description').text = "The latest uploads to the image board"
-        ET.SubElement(channel, 'link').text = make_http(make_link("post/list"))
+        ET.SubElement(channel, 'link').text = make_http("/")
         ET.SubElement(channel, 'generator').text = "Shimpy-%s" % __version__
+        ET.SubElement(channel, 'copyright').text = "(c) 2013 Shish"
 
         if page_number > 1:
             ET.SubElement(channel, 'atom:link', {"rel": "previous", "href": href_prev})
@@ -127,7 +128,8 @@ class RSSImages(Extension):
 
         for image in images:
             link = make_http(make_link("post/view/%d" % image.id))
-            posted = ""
+            # %z would be better than +0000, if posted had a timezone
+            posted = image.posted.strftime("%a, %d %b %Y %H:%M:%S +0000")
             content = ("""
                 <p>%(thumb)s</p>
                 <p>Uploaded by %(name)s</p>

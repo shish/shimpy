@@ -6,7 +6,7 @@ class User(Base):
     id = Column(Integer, primary_key=True, nullable=False)
     username = Column("name", Unicode, unique=True, nullable=False)
     password = Column("pass", String, nullable=False)
-    joindate = Column(DateTime, nullable=False, default=func.now())
+    joindate = Column(DateTime(timezone=True), nullable=False, default=func.now())
     email = Column(String, nullable=True)
     category = Column("class", String, nullable=False)
 
@@ -62,7 +62,7 @@ class PrivateMessage(Base):
     id = Column(Integer, primary_key=True, nullable=False)
     user_from_id = Column("from_id", Integer, ForeignKey("users.id"), nullable=False)
     user_to_id = Column("to_id", Integer, ForeignKey("users.id"), nullable=False)
-    sent_date = Column(DateTime, nullable=False, default=func.now())
+    sent_date = Column(DateTime(timezone=True), nullable=False, default=func.now())
     subject = Column(Unicode, nullable=False)
     message = Column(Unicode, nullable=False)
     is_read = Column(Boolean, nullable=False, default=False)

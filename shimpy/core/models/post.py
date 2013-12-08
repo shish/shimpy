@@ -3,6 +3,7 @@ from shimpy.core.utils import make_link, get_thumbnail_size
 from shimpy.core.context import context
 from shimpy.core.balance import balance
 
+from urllib import quote
 import logging
 
 log = logging.getLogger(__name__)
@@ -25,7 +26,7 @@ class Post(Base):
     fingerprint = Column("hash", String, nullable=False)
     width = Column(Integer, nullable=False, default=0)
     height = Column(Integer, nullable=False, default=0)
-    posted = Column(DateTime, nullable=False, default=func.now())
+    posted = Column(DateTime(timezone=True), nullable=False, default=func.now())
     source = Column(Unicode)
     locked = Column(Boolean, nullable=False, default=False)
     ext = Column(String)
@@ -105,7 +106,7 @@ class Post(Base):
         tmpl = tmpl % {
             "id": self.id,
             "hash": self.fingerprint,
-            "tags": self.tags_plain_text,
+            "tags": quote(self.tags_plain_text),
             #"base": self.,
             "ext": "jpg",  # FIXME
         }
@@ -130,11 +131,11 @@ class Post(Base):
 
     @property
     def tags_plain_text(self):
-        return " ".join([tag.name for tag in self.tags])
+        return " ".join(sorted([tag.name for tag in self.tags]))
 
     @property
     def tooltip(self):
-        return " ".join([tag.name for tag in self.tags])
+        return " ".join(sorted([tag.name for tag in self.tags]))
 
     @property
     def r34_url(self):
@@ -242,7 +243,7 @@ class Comment(Base):
     user_ip = Column("owner_ip", String(255), nullable=False)
     post_id = Column("image_id", Integer, ForeignKey("images.id"), nullable=False)
     body = Column("comment", Unicode, nullable=False)
-    posted = Column(DateTime, nullable=False, default=func.now())
+    posted = Column(DateTime(timezone=True), nullable=False, default=func.now())
 
     user = relationship("User")
     post = relationship("Post")
