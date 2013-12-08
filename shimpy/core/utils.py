@@ -1,6 +1,7 @@
 from shimpy.core.context import context
 
 import os
+from urlparse import urljoin
 
 
 def make_dirs_for(filename):
@@ -23,6 +24,18 @@ def make_link(page=None, query=None):
     if query:
         link = link + "?" + query
     return link
+
+
+def make_http(link):
+    """
+    >>> from mock import Mock
+    >>> context.request = Mock(url="http://www.foo.com")
+    >>> make_http("/foo/bar")
+    'http://www.foo.com/foo/bar'
+    >>> make_http("http://cake.com/foo/bar")
+    'http://cake.com/foo/bar'
+    """
+    return urljoin(context.request.url, link)
 
 
 def warehouse_path(base, name, create=True):

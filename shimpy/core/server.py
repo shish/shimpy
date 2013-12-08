@@ -103,7 +103,7 @@ class Shimpy(object):
 
 def main():
     logging.basicConfig(
-        level=logging.INFO,
+        level=logging.DEBUG,
         format="%(asctime)s %(levelname)4.4s %(name)s %(message)s"
     )
     s = Shimpy()

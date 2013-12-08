@@ -1,5 +1,5 @@
 from .meta import *
-from shimpy.core.utils import make_link
+from shimpy.core.utils import make_link, get_thumbnail_size
 from shimpy.core.context import context
 from shimpy.core.balance import balance
 
@@ -83,6 +83,10 @@ class Post(Base):
                 "/thumbs/$(hash)s/thumb.jpg"
             ).replace("$", "%")
         )
+
+    @property
+    def thumb_size(self):
+        return get_thumbnail_size(self.width, self.height)
 
     @property
     def image_url(self):
@@ -182,8 +186,12 @@ class Tag(Base):
 
     @staticmethod
     def get(name):
-        name = Alias.resolve(name)
-        return context.database.query(Tag).filter(Tag.name.ilike(name)).first()
+        tag = context.cache.get("tag-object:%s" % repr(name))
+        if not tag:
+            name = Alias.resolve(name)
+            tag = context.database.query(Tag).filter(Tag.name.ilike(name)).first()
+            context.cache.set("tag-object:%s" % repr(name), tag)
+        return tag
 
     @staticmethod
     def get_or_create(name):

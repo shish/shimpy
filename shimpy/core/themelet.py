@@ -1,5 +1,7 @@
 from shimpy.core.block import Block
 from shimpy.core.utils import make_link, get_thumbnail_size
+from shimpy.core.context import context
+
 import random
 from webhelpers.html import literal
 
@@ -16,9 +18,13 @@ class Themelet(object):
         self.display_error(page, 403, "Permission Denied", "You do not have permission to access this page")
 
     def build_thumb_html(self, image):
-        w, h = get_thumbnail_size(image.width, image.height)
+        cached = context.cache.get("thumbnail-html-by-image-id:%d" % image.id)
+        if cached:
+            return cached
+
+        w, h = image.thumb_size
         # TODO
-        return literal("""
+        thumb = literal("""
             <a href="%(view_link)s" class="thumb shm-thumb" data-tags="%(tags)s" data-post-id="%(id)d">
                 <img
                     id="thumb_%(id)d"
@@ -36,6 +42,9 @@ class Themelet(object):
             "height": h,
             "width": w,
         }
+
+        context.cache.set("thumbnail-html-by-image-id:%d" % image.id, thumb)
+        return thumb
 
     def display_paginator(self, page, base, query, page_number, total_pages):
         if total_pages == 0:

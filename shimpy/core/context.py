@@ -3,23 +3,14 @@ from webhelpers.html import literal
 
 import threading
 from time import time
+import logging
+
+log = logging.getLogger(__name__)
 
 
 def _get_user(database, request):
     from shimpy.core.models import User
     return database.query(User).first()
-
-
-class Cache(object):
-    def __init__(self):
-        self.hit_count = 0
-        self.miss_count = 0
-
-    def get(self, key):
-        return None
-
-    def set(self, key, value, timeout):
-        pass
 
 
 class Context(threading.local):
@@ -29,6 +20,7 @@ class Context(threading.local):
     """
     def configure(self, server, database, environment):
         from shimpy.core.page import Page
+        from shimpy.core.cache import Cache
         self.environment = environment
         self.server = server
         self.request = Request(environment)
@@ -46,7 +38,7 @@ class Context(threading.local):
 
     def get_debug_info(self):
         from shimpy.core import __version__
-        return literal("""
+        data = literal("""
             <br>
             Time: %.2f -
             Events sent: %d -
@@ -58,6 +50,8 @@ class Context(threading.local):
             self.cache.hit_count, self.cache.miss_count,
             __version__,
         )
+        log.info(data)
+        return data
 
 
 context = Context()

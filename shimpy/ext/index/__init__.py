@@ -3,7 +3,7 @@ from shimpy.core.models import Image, Tag
 from shimpy.core.utils import SparseList, make_link
 from shimpy.core.context import context
 
-from sqlalchemy import not_
+from sqlalchemy import not_, func
 
 import os
 import logging
@@ -127,8 +127,7 @@ class Index(Extension):
         # TODO: search by posted
         # TODO: search by size
         if re.match("^[a-zA-Z0-9_-]+$", event.term):
-            import sqlalchemy
-            tag = Tag.get(sqlalchemy.func.lower(event.term))
+            tag = Tag.get(event.term)
             if tag:
                 log.info("Adding filter for plain tag: %s", event.term)
                 event.add_filter(Image.tags.contains(tag))

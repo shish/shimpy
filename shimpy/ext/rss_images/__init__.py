@@ -1,5 +1,5 @@
 from shimpy.core import Extension, __version__, Themelet
-from shimpy.core.utils import make_link
+from shimpy.core.utils import make_link, make_http
 from shimpy.core.context import context
 from shimpy.core.models import Image
 
@@ -78,6 +78,7 @@ class RSSImages(Extension):
             context.page.mode = "data"
             context.page.content_type = "application/rss+xml"
             context.page.data = self.__do_rss(images, search_terms, page_number)
+            context.get_debug_info()
 
     def __do_rss(self, images, search_terms, page_number):
         """
@@ -104,8 +105,8 @@ class RSSImages(Extension):
         search = ""
         if search_terms:
             search = " ".join(search_terms) + "/"
-        href_prev = make_link("rss/images/%s%d" % (search, page_number - 1))
-        href_next = make_link("rss/images/%s%d" % (search, page_number + 1))
+        href_prev = make_http(make_link("rss/images/%s%d" % (search, page_number - 1)))
+        href_next = make_http(make_link("rss/images/%s%d" % (search, page_number + 1)))
 
         root = ET.Element('rss', {
             'version': '2.0',
@@ -116,7 +117,7 @@ class RSSImages(Extension):
         channel = ET.SubElement(root, 'channel')
         ET.SubElement(channel, 'title').text = "Title"
         ET.SubElement(channel, 'description').text = "The latest uploads to the image board"
-        ET.SubElement(channel, 'link').text = make_link("post/list")
+        ET.SubElement(channel, 'link').text = make_http(make_link("post/list"))
         ET.SubElement(channel, 'generator').text = "Shimpy-%s" % __version__
 
         if page_number > 1:
@@ -125,7 +126,7 @@ class RSSImages(Extension):
             ET.SubElement(channel, 'atom:link', {"rel": "next", "href": href_next})
 
         for image in images:
-            link = make_link("post/view/%d" % image.id)
+            link = make_http(make_link("post/view/%d" % image.id))
             posted = ""
             content = ("""
                 <p>%(thumb)s</p>
