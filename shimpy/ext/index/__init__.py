@@ -126,7 +126,7 @@ class Index(Extension):
         # TODO: search by source
         # TODO: search by posted
         # TODO: search by size
-        if re.match("^[a-zA-Z0-9_-]+$", event.term):
+        if re.match("^[a-zA-Z0-9\'\_\-\.\(\)]+$", event.term):
             tag = Tag.get(event.term)
             if tag:
                 log.info("Adding filter for plain tag: %s", event.term)
