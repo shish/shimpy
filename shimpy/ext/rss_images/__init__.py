@@ -54,11 +54,14 @@ class RSSImages(Extension):
         """
         >>> from shimpy.core.event import PageRequestEvent
         >>> from shimpy.core.page import Page
-        >>> from mock import Mock
-        >>> context.request = Mock(path="/rss/images/1")
+        >>> from mock import Mock, MagicMock
+        >>> context.request = Mock(path="/rss/images/1", url="http://foo.com/rss/images/1")
         >>> context.config = {"title": "Site Title"}
         >>> context.page = Page()
-        >>> context.database = Mock()
+        >>> context.database = MagicMock()
+        >>> context._load_start = 0
+        >>> context._event_count = 0
+        >>> context.cache = Mock(hit_count=0, miss_count=0)
         >>> context.database.query().limit().offset().limit().all.return_value = []
         >>> ri = RSSImages()
 
@@ -82,8 +85,14 @@ class RSSImages(Extension):
 
     def __do_rss(self, images, search_terms, page_number):
         """
+        >>> from mock import Mock
+        >>> import datetime
+        >>> context.cache = Mock(get=Mock(return_value=None))
+        >>> context.config = {"thumb_width": 192, "thumb_height": 192, "title": "Site Title"}
+        >>> context.request = Mock(url="http://foo.com/rss/images")
+
         >>> data = RSSImages()._RSSImages__do_rss([
-        ...     Image(id=4, user_id=1, fingerprint="cakecakckcacakec")
+        ...     Image(id=4, user_id=1, fingerprint="cakecakckcacakec", posted=datetime.datetime.now(), user=Mock(username="bob"))
         ... ], [], 1)
         >>> '/rss/images/0' in data  # prev page link
         False

@@ -2,6 +2,9 @@ from shimpy.core.context import context
 
 import os
 from urlparse import urljoin
+import logging
+
+log = logging.getLogger(__name__)
 
 
 def make_dirs_for(filename):
@@ -35,6 +38,9 @@ def make_http(link):
     >>> make_http("http://cake.com/foo/bar")
     'http://cake.com/foo/bar'
     """
+    log.debug(context.request.url)
+    assert(isinstance(context.request.url, basestring))
+    assert(isinstance(link, basestring))
     return urljoin(context.request.url, link)
 
 
