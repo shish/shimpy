@@ -20,13 +20,17 @@ class Cache(object):
     def get(self, key):
         try:
             data = _cache_region.get(key)
+        except:
+            data = None
+
+        if data:
             self.hit_count += 1
             log.debug("Cache hit: %s" % key)
-            return data
-        except:
+        else:
             self.hit_count -= 1
             log.debug("Cache miss: %s" % key)
-            return None
+
+        return data
 
     def set(self, key, value, timeout=300):
         log.debug("Setting cache key: %s" % key)

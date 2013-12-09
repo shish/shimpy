@@ -38,19 +38,14 @@ class Context(threading.local):
 
     def get_debug_info(self):
         from shimpy.core import __version__
-        data = literal("""
-            <br>
-            Time: %.2f -
-            Events sent: %d -
-            %d cache hits and %d misses -
-            Shimpy version %s
-        """) % (
-            time() - self._load_start,
-            self._event_count,
-            self.cache.hit_count, self.cache.miss_count,
-            __version__,
-        )
-        log.info(data)
+        parts = [
+            "Time: %.2f" % (time() - self._load_start),
+            "Events sent: %d" % (self._event_count, ),
+            "%d cache hits and %d misses" % (self.cache.hit_count, self.cache.miss_count),
+            "Shimpy version %s" % (__version__, ),
+        ]
+        data = literal("<br>") + "; ".join(parts)
+        log.debug("; ".join(parts))
         return data
 
 

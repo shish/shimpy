@@ -86,7 +86,7 @@ class Shimpy(object):
     def send_event(self, event):
         context._event_depth += 1
 
-        log.info("Sending %(event)s", {"event": event.__class__.__name__})
+        log.debug("Sending %(event)s", {"event": event.__class__.__name__})
         method_name = "on" + event.__class__.__name__.replace("Event", "")
         for ext in self.extensions:
             t2 = time.time()
@@ -95,7 +95,7 @@ class Shimpy(object):
             t3 = time.time()
             if t3 - t2 > 0.1:
                 print "%-25s %-25s %-5.3f" % (event.__class__.__name__, ext.__class__.__name__, t3 - t2)
-        log.info("Ending %(event)s", {"event": event.__class__.__name__})
+        log.debug("Ending %(event)s", {"event": event.__class__.__name__})
 
         context._event_count += 1
         context._event_depth -= 1
