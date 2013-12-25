@@ -90,4 +90,4 @@ class AliasEditor(Extension):
     def add_alias_csv(self, data):
         for row in data.split("\n"):
             parts = row.strip().split(",")
-            database.add(Alias(parts[0], parts[1]))
+            context.server.send_event(AddAliasEvent(parts[0], parts[1]))
