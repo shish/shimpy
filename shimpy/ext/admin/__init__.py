@@ -1,3 +1,9 @@
+from shimpy.core import Event, Extension, Themelet
+from shimpy.core.context import context
+
+import logging
+
+log = logging.getLogger(__name__)
 
 
 class AdminBuildingEvent(Event):
@@ -106,16 +112,16 @@ class Admin(Extension):
         return True
 
     def recount_tag_use(self):
-        $database->Execute("
-                UPDATE tags
-                SET count = COALESCE(
-                    (SELECT COUNT(image_id) FROM image_tags WHERE tag_id=tags.id GROUP BY tag_id),
-                    0
-                    )
-                ");
-         $database->Execute("DELETE FROM tags WHERE count=0");
-         log_warning("admin", "Re-counted tags", true);
-         return True
+        context.database.Execute("""
+            UPDATE tags
+            SET count = COALESCE(
+                (SELECT COUNT(image_id) FROM image_tags WHERE tag_id=tags.id GROUP BY tag_id),
+                0
+            )
+        """)
+        context.database.execute("DELETE FROM tags WHERE count=0")
+        log.warning("Re-counted tags")
+        return True
 
     def database_dump(self):
         # TODO

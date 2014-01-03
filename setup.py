@@ -61,5 +61,6 @@ setup(name='Shimpy',
       statsd = shimpy.ext.statsd:StatsD
       rss_images = shimpy.ext.rss_images:RSSImages
       handle_pixel = shimpy.ext.handle_pixel:PixelFileHandler
+      custom_html_headers = shimpy.ext.custom_html_headers:CustomHTMLHeaders
       """,
       )
