@@ -62,5 +62,6 @@ setup(name='Shimpy',
       rss_images = shimpy.ext.rss_images:RSSImages
       handle_pixel = shimpy.ext.handle_pixel:PixelFileHandler
       custom_html_headers = shimpy.ext.custom_html_headers:CustomHTMLHeaders
+      word_filter = shimpy.ext.word_filter:WordFilter
       """,
       )
