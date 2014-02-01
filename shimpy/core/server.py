@@ -39,6 +39,7 @@ class Shimpy(object):
         #for name in self.hard_config.get("extensions", "list").split(","):
         #    log.info("Loading extension: %(extension)s", {"extension": name})
         self.extensions = sorted(self.extensions)
+        self.send_event(InitExtEvent())
 
     def load_hard_config(self):
         self.hard_config = SafeConfigParser()
@@ -66,7 +67,6 @@ class Shimpy(object):
         context.configure(self, sess, environment)
 
         try:
-            self.send_event(InitExtEvent())
             self.send_event(PageRequestEvent())
             context.page.render()
             Session.commit()
