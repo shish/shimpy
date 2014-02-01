@@ -51,6 +51,10 @@ class User(Base):
             return DBSession.query(User).filter(User.username == username).first()
 
     @staticmethod
+    def by_request(request):
+        return User.by_session(request, request.cookies.get("shm_user"), request.cookies.get("shm_session"))
+
+    @staticmethod
     def by_session(request, username, session):
         duser = User.by_name(username)
         if duser and md5(duser.password + request.remote_addr).hexdigest() == session:

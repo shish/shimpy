@@ -8,11 +8,6 @@ import logging
 log = logging.getLogger(__name__)
 
 
-def _get_user(database, request):
-    from shimpy.core.models import User
-    return database.query(User).first()
-
-
 class Context(threading.local):
     """
     A class to carry round all the things that are important for a given request;
@@ -26,7 +21,7 @@ class Context(threading.local):
         self.request = Request(environment)
         self.page = Page()
         self.database = database
-        self.user = _get_user(self.database, self.request)
+        self.user = User.by_request(self.request)
         self.config = server.config
         self.hard_config = server.hard_config
         self.cache = Cache()
