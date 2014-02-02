@@ -8,7 +8,26 @@ import logging
 log = logging.getLogger(__name__)
 
 
-def make_dirs_for(filename):
+def flash_message(msg):
+    log.info(msg)
+    pass
+
+
+def autodate(date):
+    return str(date)
+
+
+def captcha_check():
+    return True
+
+
+def make_dirs_for(path):
+    """
+    >>> make_dirs_for("/tmp/foodir/foo")
+    >>> os.path.exists("/tmp/foodir")
+    True
+    >>> os.path.unlink("/tmp/foodir")
+    """
     if not os.path.exists(os.path.dirname(path)):
         os.makedirs(os.path.dirname(path))
 
