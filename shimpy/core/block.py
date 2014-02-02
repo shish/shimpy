@@ -3,7 +3,7 @@ from webhelpers.html import literal, HTML
 
 
 class Block(object):
-    def __init__(self, header, body, section="main", position="0", class_=None):
+    def __init__(self, header, body, section="main", position=0, class_=None):
         self.header = header
         self.body = body
         self.section = section
