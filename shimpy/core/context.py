@@ -13,11 +13,31 @@ class Context(threading.local):
     A class to carry round all the things that are important for a given request;
     per-request global variables, in a sense
     """
+    def __init__(self):
+        threading.local.__init__(self)
+        self.environment = {}
+        self.server = None
+        self.request = None
+        self.page = None
+        self.send_event = None
+        self.database = None
+        self.user = None
+        self.config = None
+        self.hard_config = None
+        self.cache = None
+
+        self._load_start = 0
+        self._event_count = 0
+        self._query_count = 0
+        self._event_depth = 0
+
     def configure(self, server, database, environment):
         from shimpy.core.page import Page
         from shimpy.core.cache import Cache
+        from shimpy.core.models import User
         self.environment = environment
         self.server = server
+        self.send_event = server.send_event
         self.request = Request(environment)
         self.page = Page()
         self.database = database
