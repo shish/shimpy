@@ -98,7 +98,13 @@ class Shimpy(object):
         for ext in self.extensions:
             t2 = time.time()
             if hasattr(ext, method_name):
-                getattr(ext, method_name)(event, **context.__dict__)
+                on = getattr(ext, method_name)
+                onc = on.im_func.func_code
+                args = []
+                for k in onc.co_varnames[2:onc.co_argcount]:  # "self, event" are always first
+                    if k in context.__dict__:
+                        args.append(context.__dict__[k])
+                on(event, *args)
             t3 = time.time()
             if t3 - t2 > 0.1:
                 print "%-25s %-25s %-5.3f" % (event.__class__.__name__, ext.__class__.__name__, t3 - t2)
