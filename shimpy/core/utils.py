@@ -1,5 +1,6 @@
 from shimpy.core.context import context
 
+import re
 import os
 from urlparse import urljoin
 import logging
@@ -149,3 +150,38 @@ class SparseList(object):
         keys = sorted(self.values.keys())
         for key in keys:
             yield self.values[key]
+
+
+class ReCheck(object):
+    def __init__(self):
+        self.result = None
+
+    def search(self, pattern, text):
+        """
+        >>> r = ReCheck()
+        >>> m = r.search("f(o+)b", "foobar")
+        >>> m == r.result
+        True
+        >>> r.group(1)
+        'oo'
+        """
+        self.result = re.search(pattern, text)
+        return self.result
+
+    def match(self, pattern, text):
+        """
+        >>> r = ReCheck()
+        >>> m = r.match("f(o+)b", "foobar")
+        >>> m == r.result
+        True
+        >>> r.groups()
+        ('oo',)
+        """
+        self.result = re.match(pattern, text)
+        return self.result
+
+    def group(self, n):
+        return self.result.group(n)
+
+    def groups(self):
+        return self.result.groups()

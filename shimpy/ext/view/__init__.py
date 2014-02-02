@@ -1,6 +1,7 @@
 from shimpy.core import Block, Event, Extension, Themelet
 from shimpy.core.models import Image
 from shimpy.core.context import context
+from shimpy.core.utils import make_link
 from webhelpers.html import literal
 
 
@@ -60,12 +61,7 @@ class ViewImage(Extension):
     def __init__(self):
         self.theme = ViewImageTheme()
 
-    def onPageRequest(self, event):
-        page = context.page
-        user = context.user
-        database = context.database
-        send_event = context.server.send_event
-
+    def onPageRequest(self, event, page, database, send_event):
         if event.page_matches("post/prev") or event.page_matches("post/next"):
             # TODO
             pass
@@ -87,10 +83,8 @@ class ViewImage(Extension):
             page.mode = "redirect"
             page.redirect = make_link("post/view/%d" % image_id, context.request.POST["query"])
 
-    def onDisplayingImage(self, event):
-        user = context.user
+    def onDisplayingImage(self, event, send_event):
         image = event.image
-        send_event = context.server.send_event
 
         iibbe = ImageInfoBoxBuildingEvent(image)
         send_event(iibbe)

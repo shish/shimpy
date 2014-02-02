@@ -33,8 +33,8 @@ class CustomHTMLHeaders(Extension):
         )
         event.panel.add_block(sb)
 
-    def onInitExt(self, event):
-        context.config.set_default_int("sitename_in_title", 0)
+    def onInitExt(self, event, config):
+        config.set_default("sitename_in_title", 0)
 
     def onPageRequest(self, event):
         self.handle_custom_html_headers()

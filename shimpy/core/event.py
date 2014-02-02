@@ -5,15 +5,14 @@ class Event(object):
     """
     A basic event class
 
-    Devs are expected to subclass this to send events around
+    Developers are expected to subclass this to send events around
     """
-    def __init__(self):
-        pass
+    pass
 
 
 class InitExtEvent(Event):
     """
-    A wake-up call for extensions. Upon recieving an InitExtEvent an extension
+    A wake-up call for extensions. Upon receiving an InitExtEvent an extension
     should check that it's database tables are there and install them if not,
     and set any defaults with Config::set_default_int() and such.
     """

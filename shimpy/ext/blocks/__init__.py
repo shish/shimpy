@@ -1,9 +1,13 @@
 from shimpy.core import Extension, Block
 from shimpy.core.database import Base
 from shimpy.core.context import context
+from shimpy.core.utils import make_link
 
+import logging
 from fnmatch import fnmatch
 from sqlalchemy import Column, Integer, String, Unicode, UnicodeText
+
+log = logging.getLogger(__name__)
 
 
 class DataBlock(Base):
@@ -29,13 +33,7 @@ class Blocks(Extension):
         if context.user.can("manage_blocks"):
             event.add_link("Blocks Editor", make_link("blocks/list"))
 
-    def onPageRequest(self, event):
-        config = context.config
-        database = context.database
-        page = context.page
-        user = context.user
-        cache = context.cache
-
+    def onPageRequest(self, event, request, config, database, page, user, cache):
         blocks = cache.get("blocks")
         if not blocks:
             blocks = database.query(DataBlock).all()
@@ -49,30 +47,30 @@ class Blocks(Extension):
             if event.get_arg(0) == "add":
                 if user.check_auth_token():
                     database.add(DataBlock(
-                        pages=POST["pages"],
-                        title=POST["title"],
-                        area=POST["area"],
-                        priority=POST["priority"],
-                        content=POST["content"],
+                        pages=request.POST["pages"],
+                        title=request.POST["title"],
+                        area=request.POST["area"],
+                        priority=request.POST["priority"],
+                        content=request.POST["content"],
                     ))
-                    log.info("blocks", "Added Block #" + (database.get_last_insert_id('blocks_id_seq')) + " (" + _POST['title'] + ")")
+                    log.info("blocks", "Added Block #" + (database.get_last_insert_id('blocks_id_seq')) + " (" + request.POST['title'] + ")")
                     cache.delete("blocks")
                     page.mode = "redirect"
                     page.redirect = make_link("blocks/list")
 
             elif event.get_arg(0) == "update":
                 if user.check_auth_token():
-                    if _POST['delete']:
-                        database.query(DataBlock).get(POST["id"]).delete()
-                        log.info("blocks", "Deleted Block #" + _POST['id'])
+                    if request.POST['delete']:
+                        database.query(DataBlock).get(request.POST["id"]).delete()
+                        log.info("blocks", "Deleted Block #" + request.POST['id'])
                     else:
-                        bl = database.query(DataBlock).get(POST["id"])
-                        bl.pages = POST["pages"]
-                        bl.title = POST["title"]
-                        bl.area = POST["area"]
-                        bl.priority = POST["priority"]
-                        bl.content = POST["content"]
-                        log.info("blocks", "Updated Block #" + _POST['id'] + " (" + _POST['title'] + ")")
+                        bl = database.query(DataBlock).get(request.POST["id"])
+                        bl.pages = request.POST["pages"]
+                        bl.title = request.POST["title"]
+                        bl.area = request.POST["area"]
+                        bl.priority = request.POST["priority"]
+                        bl.content = request.POST["content"]
+                        log.info("blocks", "Updated Block #" + request.POST['id'] + " (" + request.POST['title'] + ")")
                     cache.delete("blocks")
                     page.mode = "redirect"
                     page.redirect = make_link("blocks/list")

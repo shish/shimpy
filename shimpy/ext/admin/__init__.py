@@ -1,5 +1,6 @@
-from shimpy.core import Event, Extension, Themelet
+from shimpy.core import Event, Extension, Themelet, PageRequestEvent
 from shimpy.core.context import context
+from shimpy.core.utils import make_link
 
 import logging
 
@@ -37,7 +38,7 @@ class Admin(Extension):
         <p>Image dump:
         <br>Download all the images as a .zip file
     """
-    def onPageRequest(self, event):
+    def onPageRequest(self, event, user, send_event):
         if event.page_matches("admin"):
             if not user.can("manage_admintools"):
                 self.theme.display_permission_denied()
@@ -69,7 +70,7 @@ class Admin(Extension):
         self.theme.display_page()
         self.theme.display_form()
 
-    def onUserBlockBuilding(self, event):
+    def onUserBlockBuilding(self, event, user):
         if user.can("manage_admintools"):
             event.add_link("Board Admin", make_link("admin"))
 
@@ -77,7 +78,7 @@ class Admin(Extension):
         if hasattr(self, event.action):
             event.redirect = getattr(self, event.action)()
 
-    def onPostListBuilding(self, event):
+    def onPostListBuilding(self, event, user):
         if user.can("manage_admintools") and event.search_terms:
             event.add_control(self.theme.dbq_html(" ".join(event.search_terms)))
 
