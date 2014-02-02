@@ -20,7 +20,7 @@ class Cache(object):
     def get(self, key):
         try:
             data = _cache_region.get(key)
-        except:
+        except Exception:
             data = None
 
         if data:
