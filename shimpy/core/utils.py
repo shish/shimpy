@@ -14,7 +14,7 @@ def flash_message(msg):
 
 
 def autodate(date):
-    return str(date)
+    return str(date)[:16]
 
 
 def captcha_check():

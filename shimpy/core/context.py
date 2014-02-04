@@ -17,7 +17,7 @@ class Context(threading.local):
         threading.local.__init__(self)
         self.environment = {}
         self.server = None
-        self.request = None
+        self.request = Request({})
         self.page = None
         self.send_event = None
         self.database = None

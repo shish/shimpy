@@ -34,4 +34,7 @@ class Cache(object):
 
     def set(self, key, value, timeout=300):
         log.debug("Setting cache key: %s" % key)
-        return _cache_region.set(key, value)
+        try:
+            return _cache_region.set(key, value)
+        except Exception:
+            pass

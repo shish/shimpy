@@ -113,6 +113,8 @@ class Shimpy(object):
         context._event_count += 1
         context._event_depth -= 1
 
+        return event
+
 
 def main(args=sys.argv):
     logging.basicConfig(

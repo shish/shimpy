@@ -1,13 +1,14 @@
 from shimpy.core.context import context
 from shimpy.core.utils import warehouse_path
 from shimpy.core.models import Image
+from shimpy.core.themelet import Themelet
 
 
 class Extension(object):
     priority = 50
 
     def __init__(self):
-        self.theme = None
+        self.theme = Themelet()
 
     def __cmp__(self, other):
         return cmp(self.priority, other.priority)

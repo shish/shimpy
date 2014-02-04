@@ -59,9 +59,14 @@ class PageRequestEvent(Event):
         False
         >>> pre.page_matches("foo/bar")
         True
+
+        Breaking at slashes
+
+        >>> pre.page_matches("fo")
+        False
         """
         req_path = self.path
-        if req_path.startswith(page):
+        if req_path == page or req_path.startswith(page + "/"):
             arg_str = req_path[len(page):].lstrip("/")
             self.args = arg_str.split("/") if arg_str else []
             return True

@@ -41,13 +41,13 @@ class CustomHTMLHeaders(Extension):
         self.handle_modified_page_title()
 
     def handle_custom_html_headers(self):
-        header = context.config.get_string('custom_html_headers', '')
+        header = context.config.get('custom_html_headers', '')
         if header:
             context.page.add_html_header(header)
 
     def handle_modified_page_title(self):
-        site_title = context.config.get_string("title")
-        sitename_in_title = context.config.get_int("sitename_in_title")
+        site_title = context.config.get("title", '')
+        sitename_in_title = context.config.get("sitename_in_title", 0)
 
         # if feature is enabled & sitename isn't already in title
         # (can occur on index & other pages)
