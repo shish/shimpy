@@ -27,7 +27,7 @@ class Cache(object):
             self.hit_count += 1
             log.debug("Cache hit: %s" % key)
         else:
-            self.hit_count -= 1
+            self.miss_count += 1
             log.debug("Cache miss: %s" % key)
 
         return data
