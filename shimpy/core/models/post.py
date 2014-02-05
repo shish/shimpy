@@ -106,7 +106,7 @@ class Post(Base):
         tmpl = tmpl % {
             "id": self.id,
             "hash": self.fingerprint,
-            "tags": quote(self.tags_plain_text),
+            "tags": quote(self.tags_plain_text.encode('utf8')),
             #"base": self.,
             "ext": "jpg",  # FIXME
         }
