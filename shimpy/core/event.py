@@ -106,11 +106,14 @@ class PageRequestEvent(Event):
 
     def get_page_number(self):
         page_number = 1
-        if self.count_args() == 1:
-            page_number = int(self.get_arg(0))
-        if self.count_args() == 2:
-            page_number = int(self.get_arg(1))
-        if page_number == 0:
+        try:
+            if self.count_args() == 1:
+                page_number = int(self.get_arg(0) or '1')
+            if self.count_args() == 2:
+                page_number = int(self.get_arg(1) or '1')
+            if page_number == 0:
+                page_number = 1
+        except ValueError:
             page_number = 1
         return page_number
 
