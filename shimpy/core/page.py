@@ -3,6 +3,7 @@ from webhelpers.html import literal
 from glob import glob
 from datetime import datetime, timedelta
 
+from shimpy.core import __version__
 from shimpy.core.utils import SparseList
 from shimpy.core.context import context
 
@@ -54,7 +55,7 @@ class Page(object):
 
     def render(self):
         self.add_http_header("Content-type", self.content_type)
-        self.add_http_header("X-Powered-By", "Shimpy Alpha")
+        self.add_http_header("X-Powered-By", "Shimpy %s" % __version__)
 
         if self.mode == "page":
             if context.hard_config.get("cache", "http") == "on":
