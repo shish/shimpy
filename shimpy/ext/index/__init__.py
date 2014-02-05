@@ -19,20 +19,13 @@ class SearchTermParseEvent(Event):
         self.results = results
         self.term = term
         self.negative = negative
+        self.filter_added = False
 
     def add_filter(self, f):
+        self.filter_added = True
         if self.negative:
             f = not_(f)
         self.results = self.results.filter(f)
-
-    def is_querylet_set(self):
-        return len(self.querylets) > 0
-
-    def get_querylest(self):
-        return self.querylets
-
-    def add_querylet(self, q):
-        self.querylets.append(q)
 
 
 class SearchTermParseException(Exception):
@@ -49,6 +42,8 @@ class PostListBuildingEvent(Event):
 
 
 class Index(Extension):
+    priority = 80  # STPE fallback needs to be last of the STPE handlers
+
     def __init__(self):
         self.theme = IndexTheme()
         #self.theme = Template(filename='shimpy/ext/index/theme.mako')
@@ -126,7 +121,19 @@ class Index(Extension):
         # TODO: search by source
         # TODO: search by posted
         # TODO: search by size
-        if re.match("^[a-zA-Z0-9\'\_\-\.\(\)]+$", event.term):
+
+        # TODO: move to user ext
+        m = re.match("^user_id=(\d+)$", event.term)
+        if m:
+            event.add_filter(Image.user_id == m.group(1))
+
+        # TODO: move to numeric score ext
+        m = re.match("^score([<>=]+)(\d+)$", event.term)
+        if m:
+            event.add_filter(Image.score.op(m.group(1))(m.group(2)))
+
+        if not event.filter_added:
+            # re.match("^[a-zA-Z0-9\'\_\-\.\(\)]+$", event.term):
             tag = Tag.get(event.term)
             if tag:
                 log.info("Adding filter for plain tag: %s", event.term)
