@@ -14,8 +14,9 @@ class Handle404(Extension):
     def onPageRequest(self, event):
         # TODO: handle /foo.bar if /static/foo.bar exists (or theme'd override)
         if re.match("^/[a-zA-Z0-9\.\-]+$", context.request.path):
+            theme = context.config.get("theme", "default")
             options = [
-                os.path.abspath(os.path.join("shimpy", "theme", "./" + context.request.path)),
+                os.path.abspath(os.path.join("shimpy", "theme", theme, "./" + context.request.path)),
                 os.path.abspath(os.path.join("shimpy", "static", "./" + context.request.path)),
             ]
             existing = [path for path in options if os.path.isfile(path)]

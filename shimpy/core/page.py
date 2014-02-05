@@ -67,7 +67,7 @@ class Page(object):
             self.blocks = sorted(self.blocks)
             self.add_auto_html_headers()
 
-            template = Template(filename='shimpy/theme/layout.mako')
+            template = Template(filename='shimpy/theme/%s/layout.mako' % context.config.get("theme", "default"))
             self.data = template.render(ctx=context, page=self)
             self.mode = "data"
             self.filename = None
@@ -93,11 +93,21 @@ class Page(object):
         self.add_html_header(literal("<link rel='icon' type='image/x-icon' href='/favicon.ico'>"))
         self.add_html_header(literal("<link rel='apple-touch-icon' href='/apple-touch-icon.png'>"))
 
+        theme = context.config.get("theme", "default")
+
         # TODO: concatenate files
-        for css in glob("shimpy/static/*.css") + glob("shimpy/ext/*/style.css") + glob("shimpy/theme/*.css"):
+        for css in (
+            glob("shimpy/static/*.css") +
+            glob("shimpy/ext/*/style.css") +
+            glob("shimpy/theme/%s/*.css" % theme)
+        ):
             css = css.replace("shimpy/static/", "")
-            css = css.replace("shimpy/theme/", "")
+            css = css.replace("shimpy/theme/%s/" % theme, "")
             self.add_html_header(literal("<link rel='stylesheet' href='/%s' type='text/css'>") % css)
 
-        for js in glob("shimpy/static/*.js") + glob("shimpy/ext/*/script.css") + glob("shimpy/theme/script.js"):
+        for js in (
+            glob("shimpy/static/*.js") +
+            glob("shimpy/ext/*/script.css") +
+            glob("shimpy/theme/%s/script.js" % theme)
+        ):
             self.add_html_header(literal("<script src='%s'></script>") % js.replace("shimpy/static", ""))

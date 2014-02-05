@@ -10,6 +10,7 @@ requires = [
     'SQLAlchemy',
     'webhelpers',
     'mako',
+    'lesscpy',
 
     #'psycopg2',
     'bbcode',

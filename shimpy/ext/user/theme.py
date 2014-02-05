@@ -1,4 +1,4 @@
-from webhelpers.html import HTML, literal
+from webhelpers.html import HTML, literal, tags
 from shimpy.core.block import Block, NavBlock
 from shimpy.core.themelet import Themelet
 from shimpy.core.utils import make_link
@@ -33,6 +33,12 @@ class UserManagerTheme(Themelet):
     # User block (Login or User Links)
     ###################################################################
 
+    def _user_block_location(self):
+        if context.config.get("theme", "default") == "rule34":
+            return "head"
+        else:
+            return "left"
+
     def display_user_links(self, user, parts):
         pass
 
@@ -42,21 +48,21 @@ class UserManagerTheme(Themelet):
         html = "Logged in as %s" % user.username
         for part in parts:
             html = html + literal('<br><a href="%s">%s</a>') % (part["link"], part["name"])
-        page.add_block(Block("User Links", html, "left", 90))
+        page.add_block(Block("User Links", html, self._user_block_location(), 90))
 
     def display_login_block(self):
         page = context.page
         table = HTML.table(
             HTML.tr(
                 HTML.th("Username"),
-                HTML.td(HTML.input(name="username")),
+                HTML.td(tags.text("username")),
             ),
             HTML.tr(
                 HTML.th("Password"),
-                HTML.td(HTML.input(name="password", type="password")),
+                HTML.td(tags.password("password")),
             ),
             HTML.tr(
-                HTML.td(HTML.input(type="submit", value="Log In"), colspan=2)
+                HTML.td(tags.submit(name="submit", value="Log In"), colspan=2)
             ),
             HTML.tr(
                 HTML.td(HTML.small(HTML.a("Create Account", href=make_link("user_admin/create"))), colspan=2)
@@ -64,7 +70,7 @@ class UserManagerTheme(Themelet):
             # class_="form",
         )
         form = HTML.form(table, action=make_link("user_admin/login"), method="POST")
-        page.add_block(Block("Login", form, "left", 90))
+        page.add_block(Block("Login", form, self._user_block_location(), 90))
 
     ###################################################################
     # User List
@@ -94,12 +100,12 @@ class UserManagerTheme(Themelet):
 
         tds = [
             "",  # HTML.input(name="page", type="hidden", value=request.args.get("page", "1")),
-            HTML.input(name="avatar", type="checkbox", checked="checked" if request.args.get("avatar") else ""),
-            HTML.input(name="username", value=request.args.get("username")),
+            tags.checkbox("avatar", checked=request.args.get("avatar")),
+            tags.text("username", value=request.args.get("username")),
             "",
-            HTML.input(name="posts", type="checkbox", value="1", checked="checked" if request.args.get("posts") else ""),
-            HTML.input(name="comments", type="checkbox", value="1", checked="checked" if request.args.get("comments") else ""),
-            HTML.input(type="submit", value="Search"),
+            tags.checkbox("posts", value="1", checked=request.args.get("posts")),
+            tags.checkbox("comments", value="1", checked=request.args.get("comments")),
+            tags.submit(name="submit", value="Search"),
         ]
         if user.can("view_user_email"):
             HTML.input(name="email")
