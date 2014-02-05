@@ -72,6 +72,7 @@ NAV .blockbody {
 }
 NAV TABLE {
 	width: 150px;
+    margin: auto;
 }
 NAV TD {
 	vertical-align: middle;

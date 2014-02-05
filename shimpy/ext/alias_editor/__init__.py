@@ -1,5 +1,11 @@
 from shimpy.core import Event, Extension, Themelet
 from shimpy.core.context import context
+from shimpy.core.utils import make_link
+from shimpy.core.models import Alias
+
+import logging
+
+log = logging.getLogger(__name__)
 
 
 class AddAliasEvent(Event):
@@ -18,7 +24,7 @@ class AliasEditor(Extension):
     # missing out the images tagged with the oldtag
     priority = 60
 
-    def onPageRequest(self, event):
+    def onPageRequest(self, event, page, database, config):
         user = context.user
         request = context.request
         send_event = context.server.send_event
@@ -90,4 +96,4 @@ class AliasEditor(Extension):
     def add_alias_csv(self, data):
         for row in data.split("\n"):
             parts = row.strip().split(",")
-            database.add(Alias(parts[0], parts[1]))
+            context.server.send_event(AddAliasEvent(parts[0], parts[1]))

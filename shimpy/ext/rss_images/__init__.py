@@ -1,4 +1,4 @@
-from shimpy.core import Extension, __version__, Themelet
+from shimpy.core import Extension, __version__
 from shimpy.core.utils import make_link, make_http
 from shimpy.core.context import context
 from shimpy.core.models import Image
@@ -15,9 +15,6 @@ class RSSImages(Extension):
     License: GPLv2
     Description: Self explanatory
     """
-    def __init__(self):
-        self.theme = Themelet()
-
     def onPostListBuilding(self, event):
         """
         >>> from shimpy.ext.index import PostListBuildingEvent

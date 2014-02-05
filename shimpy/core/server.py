@@ -1,6 +1,7 @@
 from shimpy.core.page import Page
 from shimpy.core.context import context
-from shimpy.core.event import Event, PageRequestEvent, InitExtEvent
+from shimpy.core.config import Config
+from shimpy.core.event import Event, PageRequestEvent, InitExtEvent, CommandEvent
 from shimpy.core.extension import Extension
 from shimpy.core.database import connect, Session
 
@@ -8,6 +9,7 @@ from ConfigParser import SafeConfigParser
 
 import logging
 import time
+import sys
 from pkg_resources import iter_entry_points
 
 log = logging.getLogger(__name__)
@@ -22,7 +24,7 @@ class Shimpy(object):
     def __init__(self):
         self.hard_config = None
         self.extensions = []
-        self.config = {}
+        self.config = Config()
         self.database = None
 
         self.load_hard_config()
@@ -30,6 +32,7 @@ class Shimpy(object):
         self.connect_db()
         self.load_config()
         self.load_themelets()
+        self.init_extensions()
 
     def load_extensions(self):
         self.extensions = []
@@ -57,6 +60,11 @@ class Shimpy(object):
     def load_themelets(self):
         pass
 
+    def init_extensions(self):
+        sess = Session()
+        context.configure(self, sess, {})
+        self.send_event(InitExtEvent())
+
     ###################################################################
     # Page Serving
     ###################################################################
@@ -66,7 +74,6 @@ class Shimpy(object):
         context.configure(self, sess, environment)
 
         try:
-            self.send_event(InitExtEvent())
             self.send_event(PageRequestEvent())
             context.page.render()
             Session.commit()
@@ -91,7 +98,13 @@ class Shimpy(object):
         for ext in self.extensions:
             t2 = time.time()
             if hasattr(ext, method_name):
-                getattr(ext, method_name)(event)
+                on = getattr(ext, method_name)
+                onc = on.im_func.func_code
+                args = []
+                for k in onc.co_varnames[2:onc.co_argcount]:  # "self, event" are always first
+                    if k in context.__dict__:
+                        args.append(context.__dict__[k])
+                on(event, *args)
             t3 = time.time()
             if t3 - t2 > 0.1:
                 print "%-25s %-25s %-5.3f" % (event.__class__.__name__, ext.__class__.__name__, t3 - t2)
@@ -100,21 +113,26 @@ class Shimpy(object):
         context._event_count += 1
         context._event_depth -= 1
 
+        return event
 
-def main():
+
+def main(args=sys.argv):
     logging.basicConfig(
         level=logging.INFO,
         format="%(asctime)s %(levelname)4.4s %(name)s %(message)s"
     )
     s = Shimpy()
-    try:
-        log.info("Waiting for requests")
-        from werkzeug.serving import run_simple
-        run_simple(
-            s.hard_config.get("server", "addr"), int(s.hard_config.get("server", "port")),
-            s.application,
-            use_reloader=True, use_debugger=True, extra_files=["config.ini"]
-        )
-    except KeyboardInterrupt:
-        pass
+    if len(args) > 1:
+        s.send_event(CommandEvent(args[1:]))
+    else:
+        try:
+            log.info("Waiting for requests")
+            from werkzeug.serving import run_simple
+            run_simple(
+                s.hard_config.get("server", "addr"), int(s.hard_config.get("server", "port")),
+                s.application,
+                use_reloader=True, use_debugger=True, extra_files=["config.ini"]
+            )
+        except KeyboardInterrupt:
+            pass
 

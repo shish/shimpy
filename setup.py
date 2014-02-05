@@ -10,6 +10,7 @@ requires = [
     'SQLAlchemy',
     'webhelpers',
     'mako',
+    'lesscpy',
 
     #'psycopg2',
     'bbcode',
@@ -59,7 +60,11 @@ setup(name='Shimpy',
       index = shimpy.ext.index:Index
       view = shimpy.ext.view:ViewImage
       statsd = shimpy.ext.statsd:StatsD
+      statsd_primer = shimpy.ext.statsd:StatsDPrimer
       rss_images = shimpy.ext.rss_images:RSSImages
       handle_pixel = shimpy.ext.handle_pixel:PixelFileHandler
+      custom_html_headers = shimpy.ext.custom_html_headers:CustomHTMLHeaders
+      word_filter = shimpy.ext.word_filter:WordFilter
+      user_manager = shimpy.ext.user:UserManager
       """,
       )

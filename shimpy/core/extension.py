@@ -1,11 +1,14 @@
 from shimpy.core.context import context
+from shimpy.core.utils import warehouse_path
+from shimpy.core.models import Image
+from shimpy.core.themelet import Themelet
 
 
 class Extension(object):
     priority = 50
 
     def __init__(self):
-        self.theme = None
+        self.theme = Themelet()
 
     def __cmp__(self, other):
         return cmp(self.priority, other.priority)
@@ -24,11 +27,7 @@ class FormatterExtension(Extension):
 
 
 class DataHandlerExtension(Extension):
-    def onDataUpload(event):
-        user = context.user
-        database = context.database
-        send_event = context.server.send_event
-
+    def onDataUpload(self, event, database, send_event):
         if self.is_supported_ext(event.type) and self.check_contents(event.tmpname):
             if not move_upload_to_archive(event):
                 return
@@ -42,7 +41,7 @@ class DataHandlerExtension(Extension):
                 if not existing:
                     raise UploadException("Image to replace does not exist")
 
-                if exsting.hash == event.metadata["hash"]:
+                if existing.hash == event.metadata["hash"]:
                     raise UploadException("The uploaded image is the same as the one to replace.")
 
                 event.metadata["tags"] = existing.get_tag_list()
@@ -76,7 +75,6 @@ class DataHandlerExtension(Extension):
     def onDisplayingImage(self, event):
         if self.is_supported_ext(event.image.ext):
             self.theme.display_image(context.page, event.image)
-
 
     def is_supported_ext(self, ext):
         raise NotImplemented()

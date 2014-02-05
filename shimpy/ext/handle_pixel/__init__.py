@@ -1,5 +1,5 @@
 from shimpy.core.extension import DataHandlerExtension
-from shimpy.core.models.post import Post
+from shimpy.core.models.post import Post, Tag
 from shimpy.core.utils import warehouse_path, get_thumbnail_size
 from shimpy.core.context import context
 from shimpy.core import Themelet, Block
@@ -28,10 +28,10 @@ class PixelFileHandler(DataHandlerExtension):
     def is_supported_ext(self, ext):
         return ext in ["jpg", "jpeg", "gif", "png"]
 
-    def create_image_from_data(filename, metadata):
+    def create_image_from_data(self, filename, metadata):
         post = Post()
 
-        post.width, post.height = Image.open(image_filename).size
+        post.width, post.height = Image.open(filename).size
         post.filesize = metadata["size"]
         post.fingerprint = metadata["hash"]
         post.filename = metadata["filename"]
@@ -51,9 +51,9 @@ class PixelFileHandler(DataHandlerExtension):
         in_name = warehouse_path("images", fingerprint)
         out_name = warehouse_path("thumbs", fingerprint)
 
-        width, height = Image.open(image_filename).size
+        width, height = Image.open(in_name).size
 
-        Image.open(in_name)
+        im = Image.open(in_name)
         im.thumbnail(get_thumbnail_size(width, height), Image.ANTIALIAS)
         im.save(out_name, "JPEG")
         return True

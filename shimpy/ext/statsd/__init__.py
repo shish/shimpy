@@ -9,6 +9,13 @@ def dstat(name, val):
     context._stats["shimpy.%s" % name] = val
 
 
+class StatsDPrimer(Extension):
+    priority = 1
+
+    def onPageRequest(self, event):
+        context._stats = {}
+
+
 class StatsD(Extension):
     """
     Name: StatsD Interface
@@ -22,9 +29,6 @@ class StatsD(Extension):
         host = my.server.com:8125
     """
     priority = 99
-
-    def __init__(self):
-        self.__socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
     def __stats(self, type_):
         page_time = time() - context._load_start
@@ -66,7 +70,7 @@ class StatsD(Extension):
             pass
 
     def onInitExt(self, event):
-        context._stats = {}
+        self.__socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
     def onPageRequest(self, event):
         self.__stats("overall")

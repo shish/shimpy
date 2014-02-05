@@ -1,4 +1,41 @@
 from .meta import *
+import hashlib
+from time import time
+from webhelpers.html import HTML
+
+
+user_classes = {}
+
+
+class UserClass(object):
+    def __init__(self, name, parent, abilities):
+        self.name = name
+        self.parent = user_classes.get(parent)
+        self.abilities = abilities
+
+        user_classes[name] = self
+
+    def can(self, ability):
+        if ability in self.abilities:
+            return self.abilities[ability]
+        elif self.parent:
+            return self.parent.can(ability)
+        else:
+            raise Exception("Unknown permission: %r" % ability)
+
+
+UserClass("base", None, {
+    "hellbanned": False,
+    "view_ip": False,
+    "view_user_email": False,
+})
+UserClass("anonymous", "base", {})
+UserClass("user", "base", {})
+UserClass("admin", "base", {
+    "view_ip": True,
+    "view_user_email": True,
+})
+UserClass("admin-nb", "admin", {})
 
 
 class User(Base):
@@ -6,9 +43,9 @@ class User(Base):
     id = Column(Integer, primary_key=True, nullable=False)
     username = Column("name", Unicode, unique=True, nullable=False)
     password = Column("pass", String, nullable=False)
-    joindate = Column(DateTime(timezone=True), nullable=False, default=func.now())
+    join_date = Column("joindate", DateTime(timezone=True), nullable=False, default=func.now())
     email = Column(String, nullable=True)
-    category = Column("class", String, nullable=False)
+    class_name = Column("class", String, nullable=False)
 
     # self_description = Column(Unicode, nullable=False, default=u'')
     # admin_description = Column(Unicode, nullable=False, default=u'')
@@ -26,15 +63,36 @@ class User(Base):
     def is_anonymous(self):
         return self.username == "Anonymous"
 
+    def is_logged_in(self):
+        return not self.is_anonymous()
+
+    def check_auth_token(self):
+        # TODO
+        return True
+
+    def can(self, perm):
+        return user_classes[self.class_name].can(perm)
+
+    @property
+    def category(self):
+        return user_classes[self.class_name]
+
     def get_avatar_url(self, size=80):
         default = ""
         if self.email:
-            h = md5(self.email).hexdigest()
+            h = hashlib.md5(self.email).hexdigest()
             rating = "pg"
-            cb = ""
+            cb = str(int(time() / (60 * 60 * 24)))
             return "http://www.gravatar.com/avatar/%s.jpg?s=%d&d=%s&r=%s&cacheBreak=%s" % (h, size, default, rating, cb)
         else:
             return default
+
+    def get_avatar_html(self, size=80):
+        av = self.get_avatar_url(size)
+        if av:
+            return HTML.img(src=av, width=size, height=size)
+        else:
+            return ""
 
     def __str__(self):
         return "<User id=%d username=%s>" % (self.id, self.username)
@@ -51,10 +109,16 @@ class User(Base):
             return DBSession.query(User).filter(User.username == username).first()
 
     @staticmethod
+    def by_request(request):
+        return User.by_session(request, request.cookies.get("shm_user"), request.cookies.get("shm_session"))
+
+    @staticmethod
     def by_session(request, username, session):
         duser = User.by_name(username)
-        if duser and md5(duser.password + request.remote_addr).hexdigest() == session:
+        if duser and hashlib.md5(duser.password + request.remote_addr).hexdigest() == session:
             return duser
+        else:
+            return User.by_name("Anonymous")
 
 
 class PrivateMessage(Base):

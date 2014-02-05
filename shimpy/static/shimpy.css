@@ -22,11 +22,11 @@ TABLE.form TD + TH {padding-left: 8px;}
 
 TABLE.zebra {border-spacing: 0px; border: 2px solid #CCC;}
 TABLE.zebra TD, TABLE.zebra TH {vertical-align: middle; padding: 4px;}
-TABLE.zebra THEAD TD, TABLE.zebra THEAD TH {border-bottom: 2px solid #CCC;}
-TABLE.zebra TFOOT TD, TABLE.zebra TFOOT TH {border-top: 2px solid #CCC;}
+TABLE.zebra THEAD TR:last-child TD, TABLE.zebra THEAD TR:last-child TH {border-bottom: 2px solid #CCC;}
+TABLE.zebra TFOOT TR:first-child TD, TABLE.zebra TFOOT TR:first-child TH {border-top: 2px solid #CCC;}
 TABLE.zebra TR TD {border-bottom: 1px solid #DDD;}
-TABLE.zebra TR.odd {background: #EFEFEF;}
-TABLE.zebra TR.even {background: #E0E0E0;}
+TABLE.zebra TBODY TR:nth-child(odd) {background: #EFEFEF;}
+TABLE.zebra TBODY TR:nth-child(even) {background: #E0E0E0;}
 
 
 *[onclick],

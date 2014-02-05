@@ -1,9 +1,10 @@
 import hashlib
 from webhelpers.html import literal, HTML
+from webhelpers.util import update_params
 
 
 class Block(object):
-    def __init__(self, header, body, section="main", position="0", class_=None):
+    def __init__(self, header, body, section="main", position=0, class_=None):
         self.header = header
         self.body = body
         self.section = section
@@ -43,6 +44,19 @@ class Block(object):
 
 
 class NavBlock(Block):
-    def __init__(self):
-        body = HTML.a("/", href="%s")  # TODO: get main page
-        Block.__init__(self, "Navigation", body, "left", 0)
+    def __init__(self, force_pager=False):
+        from shimpy.core.context import context
+        request = context.request
+        page_num = int(request.args.get("page", 1))
+
+        nav = []
+
+        if force_pager or "page" in request.args:
+            nav.append(HTML.a("Prev", href=update_params(request.full_path, page=page_num-1)))
+
+        nav.append(HTML.a("Index", href="/"))
+
+        if force_pager or "page" in request.args:
+            nav.append(HTML.a("Next", href=update_params(request.full_path, page=page_num+1)))
+
+        Block.__init__(self, "Navigation", HTML.span(literal(" | ").join(nav)), "left", 0)

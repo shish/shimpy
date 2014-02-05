@@ -1,5 +1,6 @@
 from shimpy.core.context import context
 
+import re
 import os
 from urlparse import urljoin
 import logging
@@ -7,7 +8,26 @@ import logging
 log = logging.getLogger(__name__)
 
 
-def make_dirs_for(filename):
+def flash_message(msg):
+    log.info(msg)
+    pass
+
+
+def autodate(date):
+    return str(date)[:16]
+
+
+def captcha_check():
+    return True
+
+
+def make_dirs_for(path):
+    """
+    >>> make_dirs_for("/tmp/foodir/foo")
+    >>> os.path.exists("/tmp/foodir")
+    True
+    >>> os.path.unlink("/tmp/foodir")
+    """
     if not os.path.exists(os.path.dirname(path)):
         os.makedirs(os.path.dirname(path))
 
@@ -149,3 +169,38 @@ class SparseList(object):
         keys = sorted(self.values.keys())
         for key in keys:
             yield self.values[key]
+
+
+class ReCheck(object):
+    def __init__(self):
+        self.result = None
+
+    def search(self, pattern, text):
+        """
+        >>> r = ReCheck()
+        >>> m = r.search("f(o+)b", "foobar")
+        >>> m == r.result
+        True
+        >>> r.group(1)
+        'oo'
+        """
+        self.result = re.search(pattern, text)
+        return self.result
+
+    def match(self, pattern, text):
+        """
+        >>> r = ReCheck()
+        >>> m = r.match("f(o+)b", "foobar")
+        >>> m == r.result
+        True
+        >>> r.groups()
+        ('oo',)
+        """
+        self.result = re.match(pattern, text)
+        return self.result
+
+    def group(self, n):
+        return self.result.group(n)
+
+    def groups(self):
+        return self.result.groups()

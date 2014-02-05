@@ -5,7 +5,6 @@ from shimpy.core.context import context
 
 from sqlalchemy import not_, func
 
-import os
 import logging
 import re
 from webhelpers.html import literal
