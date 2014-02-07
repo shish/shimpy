@@ -104,11 +104,11 @@ class Page(object):
         ):
             css = css.replace("shimpy/static/", "")
             css = css.replace("shimpy/theme/%s/" % theme, "")
-            self.add_html_header(literal("<link rel='stylesheet' href='/%s' type='text/css'>") % css)
+            self.add_html_header(literal("<link rel='stylesheet' href='/static/%s' type='text/css'>") % css)
 
         for js in (
             glob("shimpy/static/*.js") +
             glob("shimpy/ext/*/script.css") +
             glob("shimpy/theme/%s/script.js" % theme)
         ):
-            self.add_html_header(literal("<script src='%s'></script>") % js.replace("shimpy/static", ""))
+            self.add_html_header(literal("<script src='/static/%s'></script>") % js.replace("shimpy/static", ""))

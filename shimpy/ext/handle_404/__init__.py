@@ -1,5 +1,6 @@
 from shimpy.core import Extension, Block, NavBlock
 from shimpy.core.context import context
+from shimpy.core.utils import ReCheck
 
 import os
 import logging
@@ -11,31 +12,53 @@ log = logging.getLogger(__name__)
 class Handle404(Extension):
     priority = 99
 
-    def onPageRequest(self, event):
-        # TODO: handle /foo.bar if /static/foo.bar exists (or theme'd override)
-        if re.match("^/[a-zA-Z0-9\.\-]+$", context.request.path):
+    @staticmethod
+    def _get_path(path):
+        """
+        >>> Handle404._get_path("/static/foo.txt")
+        'foo.txt'
+        >>> Handle404._get_path("/foo.txt")
+        'foo.txt'
+        >>> Handle404._get_path("/post/list")
+        """
+        rc = ReCheck()
+        if rc.match("^(/static)?/([a-zA-Z0-9\.\-]+)$", path):
+            return rc.group(2)
+        return None
+
+    @staticmethod
+    def _get_disk_path(path):
+        if path:
             theme = context.config.get("theme", "default")
             options = [
-                os.path.abspath(os.path.join("shimpy", "theme", theme, "./" + context.request.path)),
-                os.path.abspath(os.path.join("shimpy", "static", "./" + context.request.path)),
+                os.path.abspath(os.path.join("shimpy", "theme", theme, path)),
+                os.path.abspath(os.path.join("shimpy", "static", path)),
             ]
-            existing = [path for path in options if os.path.isfile(path)]
+            existing = [p for p in options if os.path.isfile(p)]
             if existing:
-                disk_path = existing[0]
-                log.info("Serving static file: %s" % disk_path)
-                context.page.set_expiration(600)
-                context.page.mode = "data"
-                context.page.data = file(disk_path).read()
+                return existing[0]
 
-                context.page.content_type = {
-                    "txt": "text/plain",
-                    "ico": "image/x-icon",
-                    "png": "image/png",
-                    "css": "text/css",
-                    "js": "application/javascript",
-                }.get(disk_path.split(".")[-1], "text/plain")
+    def onPageRequest(self, event, request):
+        if context.page.mode != "page" or self.count_main(context) != 0:
+            return  # something has already handled this request
 
-        if context.page.mode == "page" and self.count_main(context) == 0:
+        path = self._get_path(request.path)
+        disk_path = self._get_disk_path(path)
+
+        if disk_path:
+            log.info("Serving static file: %s" % disk_path)
+            context.page.set_expiration(600)
+            context.page.mode = "data"
+            context.page.data = file(disk_path).read()
+
+            context.page.content_type = {
+                "txt": "text/plain",
+                "ico": "image/x-icon",
+                "png": "image/png",
+                "css": "text/css",
+                "js": "application/javascript",
+            }.get(disk_path.split(".")[-1], "text/plain")
+        else:
             log.info("404 handler called for %r" % context.request.path)
             context.page.status = 404
             context.page.title = "404"
