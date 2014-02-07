@@ -2,6 +2,7 @@ from mako.template import Template
 from webhelpers.html import literal
 from glob import glob
 from datetime import datetime, timedelta
+import os
 
 from shimpy.core import __version__
 from shimpy.core.utils import SparseList
@@ -102,13 +103,17 @@ class Page(object):
             glob("shimpy/ext/*/style.css") +
             glob("shimpy/theme/%s/*.css" % theme)
         ):
+            mtime = os.stat(css).st_mtime
             css = css.replace("shimpy/static/", "")
             css = css.replace("shimpy/theme/%s/" % theme, "")
-            self.add_html_header(literal("<link rel='stylesheet' href='/static/%s' type='text/css'>") % css)
+            self.add_html_header(literal("<link rel='stylesheet' href='/static/%s?ts=%d' type='text/css'>") % (css, mtime))
 
         for js in (
             glob("shimpy/static/*.js") +
             glob("shimpy/ext/*/script.css") +
             glob("shimpy/theme/%s/script.js" % theme)
         ):
-            self.add_html_header(literal("<script src='/static/%s'></script>") % js.replace("shimpy/static", ""))
+            mtime = os.stat(js).st_mtime
+            js = js.replace("shimpy/static/", "")
+            js = js.replace("shimpy/theme/%s/" % theme, "")
+            self.add_html_header(literal("<script src='/static/%s?ts=%d'></script>") % (js, mtime))
