@@ -22,7 +22,7 @@ class Context(threading.local):
         self.send_event = None
         self.database = None
         self.user = None
-        self.config = None
+        self.config = {}
         self.hard_config = None
         self.cache = None
 

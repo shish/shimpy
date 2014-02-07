@@ -139,6 +139,24 @@ def get_thumbnail_size(orig_width, orig_height):
     return (int(orig_width * scale), int(orig_height * scale))
 
 
+def sAND(a, b):
+    from array import array
+    aa = array("B", a)
+    ab = array("B", b)
+    for n in range(len(aa)):
+        aa[n] &= ab[n]
+    return aa.tostring()
+
+
+def get_session_ip(addr):
+    if not addr:
+        return "0.0.0.0"
+    from socket import AF_INET, inet_pton, inet_ntop
+    mask = context.config.get("session_hash_mask", "255.255.0.0")
+    addr = inet_ntop(AF_INET, sAND(inet_pton(AF_INET, addr), inet_pton(AF_INET, mask)))
+    return addr
+
+
 class SparseList(object):
     """
     A vaguely listy thing which allows things to be inserted

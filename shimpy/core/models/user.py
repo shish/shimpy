@@ -2,6 +2,9 @@ from .meta import *
 import hashlib
 from time import time
 from webhelpers.html import HTML
+import logging
+
+log = logging.getLogger(__name__)
 
 
 user_classes = {}
@@ -28,6 +31,8 @@ UserClass("base", None, {
     "hellbanned": False,
     "view_ip": False,
     "view_user_email": False,
+    "manage_blocks": False,
+    "manage_alias_list": False,
 })
 UserClass("anonymous", "base", {})
 UserClass("user", "base", {})
@@ -114,8 +119,10 @@ class User(Base):
 
     @staticmethod
     def by_session(request, username, session):
+        from shimpy.core.utils import get_session_ip
         duser = User.by_name(username)
-        if duser and hashlib.md5(duser.password + request.remote_addr).hexdigest() == session:
+        addr = get_session_ip(request.access_route[0] if request.access_route else request.remote_addr)
+        if duser and hashlib.md5(duser.password + addr).hexdigest() == session:
             return duser
         else:
             return User.by_name("Anonymous")
