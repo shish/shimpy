@@ -105,10 +105,10 @@ class UserManagerTheme(Themelet):
             "",
             tags.checkbox("posts", value="1", checked=request.args.get("posts")),
             tags.checkbox("comments", value="1", checked=request.args.get("comments")),
-            tags.submit(name="submit", value="Search"),
         ]
         if user.can("view_user_email"):
-            HTML.input(name="email")
+            tds.append(tags.text("email", value=request.args.get("email")))
+        tds.append(tags.submit(name="submit", value="Search"))
         headers.append(HTML.tr(HTML.form(*[HTML.td(x) for x in tds], action="#", method="GET")))
 
         rows = []

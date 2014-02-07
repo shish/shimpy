@@ -123,7 +123,7 @@ class UserManager(Extension):
             if "posts" in request.args:
                 user_list = user_list.filter(User.post_count >= int(request.args["posts"]))
             if "email" in request.args and user.can("view_user_email"):
-                user_list = user_list.filter(User.email.ilike(request.args["email"]))
+                user_list = user_list.filter(User.email.ilike("%" + request.args["email"] + "%"))
 
             page = int(request.args.get("page", 1))
             user_list = user_list.offset((page - 1) * 100).limit(100)
