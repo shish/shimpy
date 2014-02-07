@@ -128,10 +128,13 @@ def main(args=sys.argv):
         try:
             log.info("Waiting for requests")
             from werkzeug.serving import run_simple
+            hc = s.hard_config
             run_simple(
-                s.hard_config.get("server", "addr"), int(s.hard_config.get("server", "port")),
+                hc.get("server", "addr"), int(hc.get("server", "port")),
                 s.application,
-                use_reloader=True, use_debugger=True, extra_files=["config.ini"]
+                use_reloader=int(hc.get("server", "reload")),
+                use_debugger=int(hc.get("server", "debug")),
+                extra_files=["config.ini"]
             )
         except KeyboardInterrupt:
             pass
