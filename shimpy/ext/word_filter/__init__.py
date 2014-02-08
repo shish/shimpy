@@ -52,7 +52,7 @@ class WordFilter(Extension):
         >>> wf._get_map()
         {'cake': 'frog', 'foo': 'bar'}
         """
-        raw = context.config.get("word_filter")
+        raw = context.config.get("word_filter", "")
         map_ = {}
         for line in raw.split("\n"):
             parts = line.split(",")

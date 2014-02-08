@@ -1,10 +1,22 @@
 from shimpy.core import Extension, __version__
-from shimpy.core.utils import make_link, make_http
+from shimpy.core.utils import make_link, make_http, format_text
 from shimpy.core.context import context
 from shimpy.core.models import Image
 
-import xml.etree.ElementTree as ET
 from webhelpers.html import HTML
+import webhelpers.feedgenerator as feedgenerator
+
+
+class ShimpyRSSFeed(feedgenerator.Rss201rev2Feed):
+    def rss_attributes(self):
+        attrs = super(ShimpyRSSFeed, self).rss_attributes()
+        attrs[u'xmlns:wfw'] = u'http://wellformedweb.org/CommentAPI/'
+        return attrs
+
+    def add_item_elements(self, handler, item):
+        feedgenerator.Rss201rev2Feed.add_item_elements(self, handler, item)
+        if item["commentRss"] is not None:
+            handler.addQuickElement(u"wfw:commentRss", item['commentRss'])
 
 
 class RSSImages(Extension):
@@ -47,7 +59,7 @@ class RSSImages(Extension):
             title=feed_title, href=link
         ))
 
-    def onPageRequest(self, event):
+    def onPageRequest(self, event, database):
         """
         >>> from shimpy.core.event import PageRequestEvent
         >>> from shimpy.core.page import Page
@@ -78,6 +90,14 @@ class RSSImages(Extension):
             context.page.mode = "data"
             context.page.content_type = "application/rss+xml"
             context.page.data = self.__do_rss(images, search_terms, page_number)
+            context.get_debug_info()
+
+        if event.page_matches("rss/image_comments"):
+            image = database.query(Image).get(event.get_arg(0))
+
+            context.page.mode = "data"
+            context.page.content_type = "application/rss+xml"
+            context.page.data = self.__do_comments(image)
             context.get_debug_info()
 
     def __do_rss(self, images, search_terms, page_number):
@@ -114,28 +134,22 @@ class RSSImages(Extension):
         href_prev = make_http(make_link("rss/images/%s%d" % (search, page_number - 1)))
         href_next = make_http(make_link("rss/images/%s%d" % (search, page_number + 1)))
 
-        root = ET.Element('rss', {
-            'version': '2.0',
-            'xmlns:media': "http://search.yahoo.com/mrss",
-            'xmlns:atom': "http://www.w3.org/2005/Atom",
-        })
+        feed = ShimpyRSSFeed(
+            title=context.config.get("title"),
+            link=make_http("/"),
+            description="The latest uploads to the image board",
+            language=u"en",
+            feed_copyright="(c) 2014 Shish",
+        )
+        #generator="Shimpy-%s" % __version__,
 
-        channel = ET.SubElement(root, 'channel')
-        ET.SubElement(channel, 'title').text = context.config.get("title")
-        ET.SubElement(channel, 'description').text = "The latest uploads to the image board"
-        ET.SubElement(channel, 'link').text = make_http("/")
-        ET.SubElement(channel, 'generator').text = "Shimpy-%s" % __version__
-        ET.SubElement(channel, 'copyright').text = "(c) 2013 Shish"
-
-        if page_number > 1:
-            ET.SubElement(channel, 'atom:link', {"rel": "previous", "href": href_prev})
-        if images:
-            ET.SubElement(channel, 'atom:link', {"rel": "next", "href": href_next})
+        #if page_number > 1:
+        #    ET.SubElement(channel, 'atom:link', {"rel": "previous", "href": href_prev})
+        #if images:
+        #    ET.SubElement(channel, 'atom:link', {"rel": "next", "href": href_next})
 
         for image in images:
             link = make_http(make_link("post/view/%d" % image.id))
-            # %z would be better than +0000, if posted had a timezone
-            posted = image.posted.strftime("%a, %d %b %Y %H:%M:%S +0000")
             content = ("""
                 <p>%(thumb)s</p>
                 <p>Uploaded by %(name)s</p>
@@ -144,13 +158,38 @@ class RSSImages(Extension):
                 "name": image.user.username,
             }
 
-            item = ET.SubElement(channel, "item")
-            ET.SubElement(item, "title").text = "%d - %s" % (image.id, image.tags_plain_text)
-            ET.SubElement(item, "link").text = link
-            ET.SubElement(item, "guid", {"isPermaLink": "true"}).text = link
-            ET.SubElement(item, "pubDate").text = posted
-            ET.SubElement(item, "description").text = content
-            ET.SubElement(item, "media:thumbnail", {"url": image.thumb_url})
-            ET.SubElement(item, "media:content", {"url": image.image_url})
+            feed.add_item(
+                author_name=image.user.username,
+                author_link=make_http(make_link("user/%s" % image.user.username)),
+                commentRss=make_http(make_link("rss/image_comments/%d" % image.id)),
+                title="%d - %s" % (image.id, image.tags_plain_text),
+                link=link,
+                description=content,
+                pubdate=image.posted,
+                enclosure=feedgenerator.Enclosure(image.image_url, str(image.file_size), image.mime_type),
+            )
 
-        return ET.tostring(root)
+            #ET.SubElement(item, "guid", {"isPermaLink": "true"}).text = link
+            #ET.SubElement(item, "media:thumbnail", {"url": image.thumb_url})
+            #ET.SubElement(item, "media:content", {"url": image.image_url})
+
+        return feed.writeString("utf8")
+
+    def __do_comments(self, image):
+        feed = feedgenerator.Rss201rev2Feed(
+            title="Comments for image %d" % image.id,
+            link=make_http("post/view/%d" % image.id),
+            description="",
+            language=u"en",
+        )
+        for c in image.comments:
+            feed.add_item(
+                author_name=c.user.username,
+                author_link=make_http(make_link("user/%s" % c.user.username)),
+                title="Comment by %s" % c.user.username,
+                link="",
+                description=format_text(c.body),
+                pubdate=c.posted,
+            )
+
+        return feed.writeString("utf8")

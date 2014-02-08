@@ -26,6 +26,7 @@ class Post(Base):
     fingerprint = Column("hash", String, nullable=False)
     width = Column(Integer, nullable=False, default=0)
     height = Column(Integer, nullable=False, default=0)
+    file_size = Column("filesize", Integer, nullable=False, default=0)
     posted = Column(DateTime(timezone=True), nullable=False, default=func.now())
     source = Column(Unicode)
     locked = Column(Boolean, nullable=False, default=False)
@@ -141,6 +142,10 @@ class Post(Base):
     def r34_url(self):
         return "http://rule34.paheal.net/post/view/%d" % (self.id,)
 
+    @property
+    def mime_type(self):
+        return "image/jpeg"
+
     def __str__(self):
         return "<Post id=%d>" % (self.id,)
 
@@ -190,7 +195,7 @@ class Tag(Base):
         tag = context.cache.get("tag-object:%s" % repr(name))
         if not tag:
             name = Alias.resolve(name)
-            tag = context.database.query(Tag).filter(Tag.name.ilike(name)).first()
+            tag = context.database.query(Tag).filter(func.lower(Tag.name) == name.lower()).first()
             context.cache.set("tag-object:%s" % repr(name), tag)
         return tag
 

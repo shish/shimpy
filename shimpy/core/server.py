@@ -123,6 +123,7 @@ def main(args=sys.argv):
     )
     s = Shimpy()
     if len(args) > 1:
+        args = [a.decode(sys.stdin.encoding) for a in args]
         log.info("Sending command event: %r", args[1:])
         s.send_event(CommandEvent(args[1:]))
     else:

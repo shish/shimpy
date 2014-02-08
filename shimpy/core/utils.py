@@ -1,4 +1,5 @@
 from shimpy.core.context import context
+from shimpy.core.event import TextFormattingEvent
 
 import re
 import os
@@ -15,6 +16,12 @@ def flash_message(msg):
 
 def autodate(date):
     return str(date)[:16]
+
+
+def format_text(text):
+    tfe = TextFormattingEvent(text)
+    context.server.send_event(tfe)
+    return tfe.formatted
 
 
 def captcha_check():
