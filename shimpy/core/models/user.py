@@ -125,7 +125,7 @@ class User(Base):
         if duser and hashlib.md5(duser.password + addr).hexdigest() == session:
             return duser
         else:
-            return User.by_name("Anonymous")
+            return User.by_name(u"Anonymous")
 
 
 class PrivateMessage(Base):

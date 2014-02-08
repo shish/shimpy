@@ -51,6 +51,7 @@ setup(name='Shimpy',
       start-shimpy = shimpy.core.server:main
 
       [shimpy.extensions]
+      cmdline = shimpy.ext.cmdline:CmdLine
       alias_editor = shimpy.ext.alias_editor:AliasEditor
       ban_words = shimpy.ext.ban_words:BanWords
       bbcode = shimpy.ext.bbcode:BBCode
