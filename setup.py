@@ -11,7 +11,7 @@ requires = [
     'webhelpers',
     'mako',
     'lesscpy',
-
+    'structlog',
     #'psycopg2',
     'bbcode',
     'dogpile.cache',

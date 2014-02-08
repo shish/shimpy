@@ -5,12 +5,12 @@ from shimpy.core.context import context
 
 from sqlalchemy import not_, func
 
-import logging
+import structlog
 import re
 from webhelpers.html import literal
 from .theme import IndexTheme
 
-log = logging.getLogger(__name__)
+log = structlog.get_logger()
 
 
 class SearchTermParseEvent(Event):
@@ -135,11 +135,11 @@ class Index(Extension):
             # re.match("^[a-zA-Z0-9\'\_\-\.\(\)]+$", event.term):
             tag = Tag.get(event.term)
             if tag:
-                log.info("Adding filter for plain tag: %s (%s)", event.term, tag.name)
+                log.debug("Adding filter for plain tag", term=event.term, tag=tag.name)
                 event.add_filter(Image.tags.contains(tag))
             else:
                 if not event.negative:
                     # if the tag is negative, it doesn't
                     # matter that we couldn't find it
-                    log.info("Tag %s not found", event.term)
+                    log.debug("Tag not found", term=event.term)
                     event.add_filter(False)
