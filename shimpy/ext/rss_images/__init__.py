@@ -173,7 +173,7 @@ class RSSImages(Extension):
             #ET.SubElement(item, "media:thumbnail", {"url": image.thumb_url})
             #ET.SubElement(item, "media:content", {"url": image.image_url})
 
-        return feed.writeString("utf8")
+        return feed.writeString("utf-8")
 
     def __do_comments(self, image):
         feed = feedgenerator.Rss201rev2Feed(
@@ -192,4 +192,4 @@ class RSSImages(Extension):
                 pubdate=c.posted,
             )
 
-        return feed.writeString("utf8")
+        return feed.writeString("utf-8")
