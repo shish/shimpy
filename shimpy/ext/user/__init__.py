@@ -3,12 +3,12 @@ from shimpy.core.context import context
 from shimpy.core.utils import SparseList, flash_message, make_link, autodate, captcha_check, ReCheck
 from shimpy.core.models import User, Image as Post
 
-import logging
 import hashlib
 import re
 from time import time
+import structlog
 
-log = logging.getLogger(__name__)
+log = structlog.get_logger()
 
 
 class UserBlockBuildingEvent(Event):
@@ -263,9 +263,9 @@ class UserManager(Extension):
         display_user = User.by_name_and_hash(username, hash_)
         if display_user:
             self.set_login_cookie(display_user.name, password)
-            log.info("User %(user)s logged in", {"user": display_user.name})
+            log.info("User logged in", target_user=display_user.name)
         else:
-            log.warning("Failed to log in as %s", username)
+            log.warning("Failed to log in as", target_user=username)
         return display_user
 
     def logout(self):

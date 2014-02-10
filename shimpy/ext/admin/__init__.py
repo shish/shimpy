@@ -2,9 +2,9 @@ from shimpy.core import Event, Extension, Themelet, PageRequestEvent
 from shimpy.core.context import context
 from shimpy.core.utils import make_link
 
-import logging
+import structlog
 
-log = logging.getLogger(__name__)
+log = structlog.get_logger()
 
 
 class AdminBuildingEvent(Event):
@@ -50,7 +50,7 @@ class Admin(Extension):
                     aae = AdminActionEvent(action)
 
                     if user.check_auth_token():
-                        log.info("Util: %s", action)
+                        log.info("Running admin util", action=action)
                         send_event(aae)
 
                     if aae.redirect:
@@ -88,10 +88,10 @@ class Admin(Extension):
 
         assert query
 
-        log.warning("Mass deleting: %r", query)
+        log.warning("Mass deleting", query=query)
         count = 0
         # TODO
-        log.debug("Deleted %d images", count)
+        log.debug("Deleted images", count=count)
 
         context.page.mode = "redirect"
         context.page.redirect = make_link("post/link")
@@ -102,7 +102,7 @@ class Admin(Extension):
             "UPDATE tags SET tag=:tag WHERE SCORE_STRNORM(tag) = SCORE_STRNORM(:tag)",
             {"tag": context.request.form['tag']}
         )
-        log.info("Fixed the case of %r", context.request.form['tag'])
+        log.info("Fixed the case of a tag", tag=context.request.form['tag'])
         return True
 
     def lowercase_all_tags(self):

@@ -5,9 +5,9 @@ from sqlalchemy import Column, Integer, String
 from sqlalchemy.orm import scoped_session
 from sqlalchemy.orm import sessionmaker
 
-import logging
+import structlog
 
-log = logging.getLogger(__name__)
+log = structlog.get_logger()
 
 session_factory = sessionmaker()
 Session = scoped_session(session_factory)

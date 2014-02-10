@@ -2,9 +2,6 @@ from .meta import *
 import hashlib
 from time import time
 from webhelpers.html import HTML
-import logging
-
-log = logging.getLogger(__name__)
 
 
 user_classes = {}

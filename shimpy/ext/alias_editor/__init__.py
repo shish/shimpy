@@ -3,9 +3,9 @@ from shimpy.core.context import context
 from shimpy.core.utils import make_link
 from shimpy.core.models import Alias
 
-import logging
+import structlog
 
-log = logging.getLogger(__name__)
+log = structlog.get_logger()
 
 
 class AddAliasEvent(Event):
@@ -45,7 +45,7 @@ class AliasEditor(Extension):
                 if user.can("manage_alias_list"):
                     if "oldtag" in request.form:
                         database.query(Alias).filter(Alias.oldtag == request.form["oldtag"]).delete()
-                        log.info("Deleted alias for %s", request.form["oldtag"])
+                        log.info("Deleted alias", tag=request.form["oldtag"])
                         page.mode = "redirect"
                         page.redirect = make_link("alias/list")
 

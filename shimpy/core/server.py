@@ -52,9 +52,13 @@ class Shimpy(object):
         connect(self.hard_config)
 
     def load_config(self):
-        sess = Session()
-        self.config.update({})
-        Session.remove()
+#        sess = Session()
+#        for row in sess.execute("SELECT name, value FROM config"):
+#            try:
+#                self.config[row["name"]] = int(row["value"])
+#            except:
+#                self.config[row["name"]] = row["value"]
+#        Session.remove()
 
         section = "forced_config"
         for option in self.hard_config.options(section):
@@ -97,7 +101,7 @@ class Shimpy(object):
     def send_event(self, event):
         context._event_depth += 1
 
-        log.debug("Sending event", eventclass=event.__class__.__name__)
+        #log.debug("Sending event", eventclass=event.__class__.__name__)
         method_name = "on" + event.__class__.__name__.replace("Event", "")
         for ext in self.extensions:
             t2 = time.time()
@@ -112,7 +116,7 @@ class Shimpy(object):
             t3 = time.time()
             if t3 - t2 > 0.1:
                 log.warning("Slow event", eventclass=event.__class__.__name__, ext=ext.__class__.__name__, time=t3 - t2)
-        log.debug("Ending event", eventclass=event.__class__.__name__)
+        #log.debug("Ending event", eventclass=event.__class__.__name__)
 
         context._event_count += 1
         context._event_depth -= 1
@@ -126,9 +130,13 @@ def main(args=sys.argv):
             structlog.processors.KeyValueRenderer(
                 key_order=['request_id', 'user', 'addr', 'event'],
             ),
+            #structlog.processors.StackInfoRenderer(),
+            #structlog.processors.format_exc_info,
+            #structlog.processors.JSONRenderer(),
         ],
         #logger_factory=structlog.stdlib.LoggerFactory(),
         context_class=structlog.threadlocal.wrap_dict(dict),
+        cache_logger_on_first_use=True,
     )
     logging.basicConfig(
         level=logging.INFO,

@@ -4,9 +4,6 @@ from shimpy.core.context import context
 from shimpy.core.balance import balance
 
 from urllib import quote
-import logging
-
-log = logging.getLogger(__name__)
 
 
 CONF_THUMB_WIDTH = 192
@@ -48,6 +45,9 @@ class Post(Base):
 
     @staticmethod
     def find_images(offset, limit, search_terms):
+        assert isinstance(offset, int)
+        assert isinstance(limit, int)
+        assert isinstance(search_terms, list)
         return Post.find_all_images(search_terms).offset(offset).limit(limit).all()  # [start:start + offset]
 
     @staticmethod
@@ -74,7 +74,7 @@ class Post(Base):
 
         results = results.order_by(Post.id.desc())
         results = results.limit(100)  # during dev
-        log.debug("Image search: %s", results)
+        #log.debug("Image search: %s", results)
         return results
 
     @property

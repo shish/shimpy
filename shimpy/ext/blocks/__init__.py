@@ -3,11 +3,11 @@ from shimpy.core.database import Base
 from shimpy.core.context import context
 from shimpy.core.utils import make_link
 
-import logging
 from fnmatch import fnmatch
 from sqlalchemy import Column, Integer, String, Unicode, UnicodeText
+import structlog
 
-log = logging.getLogger(__name__)
+log = logging.get_logger()
 
 
 class DataBlock(Base):
@@ -53,7 +53,7 @@ class Blocks(Extension):
                         priority=request.POST["priority"],
                         content=request.POST["content"],
                     ))
-                    log.info("blocks", "Added Block #" + (database.get_last_insert_id('blocks_id_seq')) + " (" + request.POST['title'] + ")")
+                    log.info("Added Block", block_id=database.get_last_insert_id('blocks_id_seq'), title=request.POST['title'])
                     cache.delete("blocks")
                     page.mode = "redirect"
                     page.redirect = make_link("blocks/list")
@@ -62,7 +62,7 @@ class Blocks(Extension):
                 if user.check_auth_token():
                     if request.POST['delete']:
                         database.query(DataBlock).get(request.POST["id"]).delete()
-                        log.info("blocks", "Deleted Block #" + request.POST['id'])
+                        log.info("Deleted Block", block_id=request.POST['id'])
                     else:
                         bl = database.query(DataBlock).get(request.POST["id"])
                         bl.pages = request.POST["pages"]
@@ -70,7 +70,7 @@ class Blocks(Extension):
                         bl.area = request.POST["area"]
                         bl.priority = request.POST["priority"]
                         bl.content = request.POST["content"]
-                        log.info("blocks", "Updated Block #" + request.POST['id'] + " (" + request.POST['title'] + ")")
+                        log.info("Updated Block", block_id=request.POST['id'], title=request.POST['title'])
                     cache.delete("blocks")
                     page.mode = "redirect"
                     page.redirect = make_link("blocks/list")

@@ -3,7 +3,6 @@ from webhelpers.html import literal
 
 import threading
 from time import time
-import logging
 import structlog
 import uuid
 

@@ -3,10 +3,10 @@ from shimpy.core.context import context
 from shimpy.core.utils import ReCheck
 
 import os
-import logging
 import re
+import structlog
 
-log = logging.getLogger(__name__)
+log = structlog.get_logger()
 
 
 class Handle404(Extension):
@@ -46,7 +46,7 @@ class Handle404(Extension):
         disk_path = self._get_disk_path(path)
 
         if disk_path:
-            log.info("Serving static file: %s" % disk_path)
+            log.info("Serving static file", path=disk_path)
             context.page.set_expiration(600)
             context.page.mode = "data"
             context.page.data = file(disk_path).read()
@@ -59,7 +59,7 @@ class Handle404(Extension):
                 "js": "application/javascript",
             }.get(disk_path.split(".")[-1], "text/plain")
         else:
-            log.info("404 handler called for %r" % context.request.path)
+            log.info("404 handler called", path=context.request.path)
             context.page.status = 404
             context.page.title = "404"
             context.page.heading = "404 - no handler found"
