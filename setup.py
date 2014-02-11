@@ -66,5 +66,6 @@ setup(name='Shimpy',
       custom_html_headers = shimpy.ext.custom_html_headers:CustomHTMLHeaders
       word_filter = shimpy.ext.word_filter:WordFilter
       user_manager = shimpy.ext.user:UserManager
+      systemd = shimpy.ext.systemd:Systemd
       """,
       )
