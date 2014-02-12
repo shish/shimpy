@@ -114,7 +114,7 @@ class Shimpy(object):
                         args.append(context.__dict__[k])
                 on(event, *args)
             t3 = time.time()
-            if t3 - t2 > 0.1:
+            if t3 - t2 > 0.5:
                 log.warning("Slow event", eventclass=event.__class__.__name__, ext=ext.__class__.__name__, time=t3 - t2)
         #log.debug("Ending event", eventclass=event.__class__.__name__)
 
