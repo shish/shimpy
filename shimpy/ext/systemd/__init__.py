@@ -7,7 +7,7 @@ import ctypes
 log = structlog.get_logger()
 
 
-class StatsD(Extension):
+class Systemd(Extension):
     """
     Name: Systemd Integration
     Author: Shish <webmaster@shishnet.org>
@@ -21,12 +21,14 @@ class StatsD(Extension):
         self.__sd = None
         try:
             self.__sd = ctypes.CDLL(ctypes.util.find_library("systemd-daemon"))
-            self.__sd.sd_notify("READY=1")
-            #self.__sd.sd_notify("MAINPID=1")  # we aren't the main pid if we're in debug-reloader mode
-        except Exception:
-            log.exception("Error loading systemd library")
+            self.__sd.sd_notify(0, "READY=1")
+            self.__sd.sd_notify(0, "MAINPID=%d" % os.getpid())  # we aren't the main pid if we're in debug-reloader mode
+            self.__sd.sd_notify(0, "STATUS=Waiting for requests")
+            log.info("Let systemd know that we're ready")
+        except Exception as e:
+            log.error("Error loading systemd library", exception=e)
 
     def onPageRequest(self, event, request):
         if self.__sd:
-            self.__sd.sd_notify("WATCHDOG=1")
-            self.__sd.sd_notify("STATUS=Got a request for %s" % request.path)
+            self.__sd.sd_notify(0, "WATCHDOG=1")
+            self.__sd.sd_notify(0, "STATUS=Got a request for %s" % str(request.path))
