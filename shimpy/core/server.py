@@ -125,6 +125,12 @@ class Shimpy(object):
 
 
 def main(args=sys.argv):
+    logging.basicConfig(
+        level=logging.INFO,
+        format="%(message)s",
+        filename="app.log",
+        #format="%(asctime)19.19s %(levelname)4.4s %(name)s %(message)s"
+    )
     structlog.configure(
         processors=[
             structlog.processors.KeyValueRenderer(
@@ -134,13 +140,9 @@ def main(args=sys.argv):
             #structlog.processors.format_exc_info,
             #structlog.processors.JSONRenderer(),
         ],
-        #logger_factory=structlog.stdlib.LoggerFactory(),
+        logger_factory=structlog.stdlib.LoggerFactory(),
         context_class=structlog.threadlocal.wrap_dict(dict),
         cache_logger_on_first_use=True,
-    )
-    logging.basicConfig(
-        level=logging.INFO,
-        format="%(asctime)19.19s %(levelname)4.4s %(name)s %(message)s"
     )
 
     s = Shimpy()

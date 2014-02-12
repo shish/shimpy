@@ -3,6 +3,7 @@ from shimpy.core.context import context
 
 import structlog
 import ctypes
+import os
 
 log = structlog.get_logger()
 

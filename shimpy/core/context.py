@@ -67,7 +67,7 @@ class Context(threading.local):
             "Shimpy version %s" % (__version__, ),
         ]
         data = literal("<br>") + "; ".join(parts)
-        log.debug("Render stats", stats="; ".join(parts))
+        #log.debug("Render stats", stats="; ".join(parts))
         return data
 
 
