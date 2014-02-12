@@ -7,7 +7,7 @@ from fnmatch import fnmatch
 from sqlalchemy import Column, Integer, String, Unicode, UnicodeText
 import structlog
 
-log = logging.get_logger()
+log = structlog.get_logger()
 
 
 class DataBlock(Base):

@@ -135,7 +135,7 @@ class Index(Extension):
             # re.match("^[a-zA-Z0-9\'\_\-\.\(\)]+$", event.term):
             tag = Tag.get(event.term)
             if tag:
-                log.debug("Adding filter for plain tag", term=event.term, tag=tag.name)
+                #log.debug("Adding filter for plain tag", term=event.term, tag=tag.name)
                 event.add_filter(Image.tags.contains(tag))
             else:
                 if not event.negative:
