@@ -16,6 +16,7 @@ requires = [
     'bbcode',
     'dogpile.cache',
     'flexihash',
+    'pylibmc',
 
     # testing
     'nose',

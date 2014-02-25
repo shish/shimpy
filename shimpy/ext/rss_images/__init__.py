@@ -11,7 +11,17 @@ class ShimpyRSSFeed(feedgenerator.Rss201rev2Feed):
     def rss_attributes(self):
         attrs = super(ShimpyRSSFeed, self).rss_attributes()
         attrs[u'xmlns:wfw'] = u'http://wellformedweb.org/CommentAPI/'
+        attrs[u'xmlns:atom'] = u'http://www.w3.org/2005/Atom'
         return attrs
+
+    def add_root_elements(self, handler):
+        feedgenerator.Rss201rev2Feed.add_root_elements(self, handler)
+        if self.feed["generator"] is not None:
+            handler.addQuickElement(u"generator", self.feed['generator'])
+        if self.feed["prev"] is not None:
+            handler.addQuickElement('atom:link', attrs={"rel": "previous", "href": self.feed["prev"]})
+        if self.feed["next"] is not None:
+            handler.addQuickElement('atom:link', attrs={"rel": "next", "href": self.feed["next"]})
 
     def add_item_elements(self, handler, item):
         feedgenerator.Rss201rev2Feed.add_item_elements(self, handler, item)
@@ -75,7 +85,7 @@ class RSSImages(Extension):
         >>> ri = RSSImages()
 
         >>> pre = PageRequestEvent()
-        >>> ri.onPageRequest(pre)
+        >>> ri.onPageRequest(pre, context.database)
         >>> context.page.mode
         'data'
         >>> context.page.content_type
@@ -140,13 +150,10 @@ class RSSImages(Extension):
             description="The latest uploads to the image board",
             language=u"en",
             feed_copyright="(c) 2014 Shish",
+            generator="Shimpy-%s" % __version__,
+            prev=href_prev if page_number > 1 else None,
+            next=href_next if images else None,
         )
-        #generator="Shimpy-%s" % __version__,
-
-        #if page_number > 1:
-        #    ET.SubElement(channel, 'atom:link', {"rel": "previous", "href": href_prev})
-        #if images:
-        #    ET.SubElement(channel, 'atom:link', {"rel": "next", "href": href_next})
 
         for image in images:
             link = make_http(make_link("post/view/%d" % image.id))

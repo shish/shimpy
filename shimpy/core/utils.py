@@ -33,7 +33,7 @@ def make_dirs_for(path):
     >>> make_dirs_for("/tmp/foodir/foo")
     >>> os.path.exists("/tmp/foodir")
     True
-    >>> os.path.unlink("/tmp/foodir")
+    >>> os.rmdir("/tmp/foodir")
     """
     if not os.path.exists(os.path.dirname(path)):
         os.makedirs(os.path.dirname(path))
