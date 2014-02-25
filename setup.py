@@ -21,7 +21,7 @@ requires = [
     # testing
     'nose',
     'coverage',
-    'unittest2',
+    #'unittest2',
     'mock',
     'werkzeug',
 
