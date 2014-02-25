@@ -8,4 +8,4 @@ python:
 install: "pip install -e ./"
 
 # command to run tests
-script: nosetests --with-doctest
+script: nosetests --with-doctest --verbose
