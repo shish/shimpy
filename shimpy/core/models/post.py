@@ -109,7 +109,7 @@ class Post(Base):
             "hash": self.fingerprint,
             "tags": quote(self.tags_plain_text.encode('utf8')),
             #"base": self.,
-            "ext": "jpg",  # FIXME
+            "ext": self.ext,
         }
         tmpl = balance(tmpl)
         return tmpl
