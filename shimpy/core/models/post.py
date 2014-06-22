@@ -144,7 +144,13 @@ class Post(Base):
 
     @property
     def mime_type(self):
-        return "image/jpeg"
+        # FIXME: do better
+        return {
+            "jpg": "image/jpeg",
+            "jpeg": "image/jpeg",
+            "gif": "image/gif",
+            "png": "image/png",
+        }.get(self.ext, "image/jpeg")
 
     def __str__(self):
         return "<Post id=%d>" % (self.id,)
