@@ -32,4 +32,4 @@ class Systemd(Extension):
     def onPageRequest(self, event, request):
         if self.__sd:
             self.__sd.sd_notify(0, "WATCHDOG=1")
-            self.__sd.sd_notify(0, "STATUS=Got a request for %s" % str(request.path))
+            self.__sd.sd_notify(0, "STATUS=Got a request for %s" % request.path.encode("ascii", "ignore"))
