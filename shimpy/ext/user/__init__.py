@@ -114,15 +114,15 @@ class UserManager(Extension):
 
         elif event.page_matches("user_admin/list"):
             user_list = database.query(User).order_by(User.id.desc())
-            if "avatar" in request.args:
+            if request.args.get("avatar"):
                 user_list = user_list.filter(User.email != "").filter(User.email != None)
-            if "username" in request.args:
+            if request.args.get("username"):
                 user_list = user_list.filter(User.username.ilike("%" + request.args["username"] + "%"))
-            if "comments" in request.args:
+            if request.args.get("comments"):
                 user_list = user_list.filter(User.comment_count >= int(request.args["comments"]))
-            if "posts" in request.args:
+            if request.args.get("posts"):
                 user_list = user_list.filter(User.post_count >= int(request.args["posts"]))
-            if "email" in request.args and user.can("view_user_email"):
+            if request.args.get("email") and user.can("view_user_email"):
                 user_list = user_list.filter(User.email.ilike("%" + request.args["email"] + "%"))
 
             page = int(request.args.get("page", 1))
