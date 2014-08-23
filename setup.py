@@ -17,6 +17,7 @@ requires = [
     'dogpile.cache',
     'flexihash',
     'pylibmc',
+    'python-bcrypt',
 
     # testing
     'nose',
