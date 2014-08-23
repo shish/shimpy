@@ -2,6 +2,7 @@ from .meta import *
 import hashlib
 from time import time
 from webhelpers.html import HTML
+import bcrypt
 
 
 user_classes = {}
@@ -100,10 +101,20 @@ class User(Base):
         return "<User id=%d username=%s>" % (self.id, self.username)
 
     def set_password(self, password):
-        self.password = md5(self.username.lower() + password).hexdigest()
+        self.password = bcrypt.hashpw(password, bcrypt.gensalt())
 
     def check_password(self, password):
-        return self.password == md5(self.username.lower() + password).hexdigest()
+        # Compat for old passwords
+        if md5(self.username.lower() + password).hexdigest() == self.password:
+            self.set_password(password)
+
+        try:
+            # some other libraries (PHP...) use 2y as the version string, when 2a
+            # is the standard...
+            two_a_pass = self.password.replace("$2y$", "$2a$")
+            return bcrypt.hashpw(password, two_a_pass) == two_a_pass
+        except ValueError:
+            return False  # invalid salt -- stored password /was/ md5, but entered password wasn't correct
 
     @staticmethod
     def by_name(username):
